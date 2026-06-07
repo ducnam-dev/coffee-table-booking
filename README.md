@@ -1,17 +1,109 @@
-# React + Vite
+# Coffee Shop Table Booking System (Pam Coffee & Tea)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Hệ thống quản lý và đặt bàn trực tuyến cho quán cà phê **Pam Coffee & Tea**, bao gồm giao diện khách hàng đặt bàn, xem thực đơn và bảng quản trị (Admin Dashboard) dành cho quản lý quán.
 
-Currently, two official plugins are available:
+Hệ thống được thiết kế theo cơ chế **Hybrid** (Đồng bộ hóa linh hoạt giữa Backend API và Trình duyệt Cache local), cho phép giao diện hoạt động mượt mà ngay cả khi backend ở chế độ offline.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🌟 Tính năng chính
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Phía Khách hàng (Customer Interface)
+* **Trang chủ:** Giới thiệu quán, hiển thị 3 thực đơn nổi bật, các tiện ích nổi bật.
+* **Đặt bàn trực tuyến:** Chọn sơ đồ bàn trực quan, điền thông tin đặt bàn (ngày giờ, số lượng khách, ghi chú), tùy chọn đặt trước thực đơn.
+* **Xem thực đơn:** Xem danh sách thực đơn phân theo nhóm danh mục (Trà Sữa, Ca Cao, Sữa Tươi, Trà Trái Cây) với mức giá rõ ràng.
+* **Sơ đồ bàn động:** Hiển thị trực quan vị trí bàn (cặp đôi, sân vườn, phòng lạnh, gác lửng) và trạng thái hiện tại (Còn trống / Đã đặt).
 
-## Expanding the ESLint configuration
+### 2. Phía Quản lý (Admin Dashboard)
+* **Thống kê tổng quan:** Theo dõi doanh thu, số lượng đặt bàn, bàn đang sử dụng và món ăn bán chạy nhất bằng biểu đồ trực quan (Chart.js).
+* **Quản lý đặt bàn:** Xem danh sách khách hàng đặt bàn, phê duyệt (`CONFIRMED`) hoặc hủy (`CANCELLED`) lượt đặt.
+* **Quản lý danh sách bàn:** Thêm bàn mới, sửa đổi trạng thái bàn, xóa bàn và thiết lập thuộc tính bàn (gần cửa sổ, ngoài trời, ổ cắm điện, số ghế).
+* **Đồng bộ hóa tự động:** Mọi thao tác thêm/sửa/xóa bàn từ trang Admin sẽ ngay lập tức được đồng bộ và phản ánh sang trang đặt bàn của Khách hàng.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-                                                                                                                                                                                                                       l
+---
+
+## 🛠️ Công nghệ sử dụng
+
+* **Frontend:**
+  * HTML5 (Cấu trúc giao diện ngữ nghĩa)
+  * CSS3 (Thiết kế phong cách hiện đại)
+  * TailwindCSS (Styling nhanh và đáp ứng tốt trên cả PC & Mobile)
+  * JavaScript ES6+ (Xử lý logic động, tương tác APIs, LocalStorage fallback)
+* **Backend:**
+  * Java Spring Boot 3
+  * Spring Security & JWT (Bảo mật xác thực phân quyền Admin / Customer)
+  * Spring Data MongoDB
+* **Database:**
+  * MongoDB (Cơ sở dữ liệu NoSQL lưu trữ lâu dài thực tế)
+
+---
+
+## 🚀 Hướng dẫn cài đặt & Khởi chạy
+
+### Yêu cầu hệ thống
+* Đã cài đặt **Java JDK 17** hoặc mới hơn.
+* Đã cài đặt **Node.js** và **npm**.
+* Đã bật dịch vụ **MongoDB** local (cổng mặc định `27017`).
+
+### 1. Khởi chạy Backend (Spring Boot)
+1. Di chuyển vào thư mục backend:
+   ```bash
+   cd backend
+   ```
+2. Biên dịch dự án:
+   ```bash
+   ./mvnw compile
+   ```
+3. Chạy ứng dụng:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+*Server Backend sẽ chạy ở cổng `8080` và tự động khởi tạo cơ sở dữ liệu `coffee_shop` cùng các dữ liệu mẫu (`DatabaseSeeder`).*
+
+### 2. Khởi chạy Giao diện (Frontend)
+1. Di chuyển vào thư mục frontend:
+   ```bash
+   cd ../frontend
+   ```
+2. Cài đặt các dependencies cần thiết (nếu có):
+   ```bash
+   npm install
+   ```
+3. Chạy server phát triển cục bộ:
+   ```bash
+   npm run dev
+   ```
+*Mở trình duyệt truy cập đường dẫn hiển thị trên terminal (thường là `http://localhost:5173`).*
+
+---
+
+## 🔐 Tài khoản thử nghiệm (Default Credentials)
+
+Hệ thống đã được seeder sẵn tài khoản mẫu để bạn kiểm tra các chức năng phân quyền:
+
+* **Tài khoản Admin (Quản trị viên):**
+  * Email: `admin@pamcoffeetea.com`
+  * Mật khẩu: `admin`
+* **Tài khoản Customer (Khách hàng):**
+  * Email: `khachhang@gmail.com`
+  * Mật khẩu: `customer`
+
+---
+
+## 📁 Cấu trúc thư mục dự án
+
+```text
+├── backend/                   # Mã nguồn Spring Boot Backend
+│   ├── src/main/java/         # Mã nguồn Java (Controllers, Services, Models, Repositories)
+│   └── src/main/resources/    # Cấu hình dự án (application.yml)
+├── frontend/                  # Mã nguồn giao diện tĩnh và assets
+│   ├── assets/                # Hình ảnh, logo, tài nguyên tĩnh
+│   ├── js/                    # Các file xử lý logic Javascript (main.js, booking.js, admin.js)
+│   ├── index.html             # Trang chủ khách hàng
+│   ├── booking.html           # Trang đặt bàn
+│   ├── tables.html            # Trang sơ đồ bàn
+│   ├── menu.html              # Trang thực đơn
+│   ├── login.html             # Trang đăng nhập
+│   └── register.html          # Trang đăng ký
+└── README.md                  # Hướng dẫn dự án
+```
