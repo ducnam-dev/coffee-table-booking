@@ -147,7 +147,7 @@
             const data = await signinRes.json();
             const userObj = {
               id: data.id,
-              username: username || data.username.split('@')[0],
+              username: username || data.email.split('@')[0],
               fullName: fullName,
               email: email,
               phone: phone,
