@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng ký - Pam Coffee & Tea</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+    }
+  </style>
+</head>
+<body class="flex min-h-screen bg-stone-50 text-stone-800 antialiased selection:bg-amber-600 selection:text-white justify-center items-center p-4">
+
+  <div class="w-full max-w-md space-y-6">
+    <!-- Header Logo / Back Home link -->
+    <div class="flex flex-col items-center text-center space-y-3">
+      <a href="./index.html" class="flex items-center gap-2 group">
+        <img src="./assets/logo.png" alt="Pam Coffee & Tea" class="h-12 w-12 rounded-full object-cover shadow-md transition-transform duration-300 group-hover:scale-105" />
+        <span class="text-2xl font-bold tracking-tight text-stone-900">
+          Pam Coffee <span class="text-amber-600">& Tea</span>
+        </span>
+      </a>
+      <h2 class="text-3xl font-extrabold text-stone-900 tracking-tight">Tạo Tài Khoản Mới</h2>
+      <p class="text-sm text-stone-500">Bắt đầu đặt giữ chỗ và hưởng các ưu đãi thành viên ngay hôm nay.</p>
+    </div>
+
+    <!-- Register Card -->
+    <div class="rounded-3xl border border-stone-200 bg-white p-8 shadow-xl">
+      <form id="register-form" class="space-y-4">
+        <div>
+          <label for="fullName" class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Họ và tên</label>
+          <input type="text" id="fullName" required placeholder="Nguyen Van A" class="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-4 py-2.5 text-sm font-semibold text-stone-800 outline-none focus:border-amber-600 focus:bg-white focus:ring-4 focus:ring-amber-600/10 transition-all duration-200" />
+        </div>
+
+        <div>
+          <label for="email" class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Email</label>
+          <input type="email" id="email" required placeholder="username@gmail.com" class="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-4 py-2.5 text-sm font-semibold text-stone-800 outline-none focus:border-amber-600 focus:bg-white focus:ring-4 focus:ring-amber-600/10 transition-all duration-200" />
+        </div>
+
+        <div>
+          <label for="phone" class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Số điện thoại</label>
+          <input type="tel" id="phone" required placeholder="09xxxxxxxx" class="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-4 py-2.5 text-sm font-semibold text-stone-800 outline-none focus:border-amber-600 focus:bg-white focus:ring-4 focus:ring-amber-600/10 transition-all duration-200" />
+        </div>
+
+        <div>
+          <label for="username" class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Tên đăng nhập</label>
+          <input type="text" id="username" required placeholder="ten_dang_nhap" class="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-4 py-2.5 text-sm font-semibold text-stone-800 outline-none focus:border-amber-600 focus:bg-white focus:ring-4 focus:ring-amber-600/10 transition-all duration-200" />
+        </div>
+
+        <div>
+          <label for="password" class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Mật khẩu</label>
+          <input type="password" id="password" required placeholder="••••••••" class="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-4 py-2.5 text-sm font-semibold text-stone-800 outline-none focus:border-amber-600 focus:bg-white focus:ring-4 focus:ring-amber-600/10 transition-all duration-200" />
+        </div>
+
+        <div>
+          <label for="confirmPassword" class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">Xác nhận mật khẩu</label>
+          <input type="password" id="confirmPassword" required placeholder="••••••••" class="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-4 py-2.5 text-sm font-semibold text-stone-800 outline-none focus:border-amber-600 focus:bg-white focus:ring-4 focus:ring-amber-600/10 transition-all duration-200" />
+        </div>
+
+        <div id="error-message" class="hidden rounded-xl bg-rose-50 border border-rose-100 p-3.5 text-xs font-medium text-rose-600">
+          Mật khẩu xác nhận không khớp!
+        </div>
+
+        <button type="submit" class="w-full rounded-xl bg-amber-600 py-3 text-center text-sm font-bold text-white shadow-lg shadow-amber-600/15 hover:bg-amber-700 hover:shadow-amber-600/30 transition-all active:scale-98 duration-200 mt-2">
+          Đăng Ký Tài Khoản
+        </button>
+      </form>
+
+      <div class="mt-6 text-center text-sm">
+        <span class="text-stone-500">Đã có tài khoản?</span>
+        <a id="login-link" href="./login.html" class="font-bold text-amber-600 hover:text-amber-700 ml-1 transition-colors">Đăng nhập</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/main.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectFrom = urlParams.get('from');
+    const tableId = urlParams.get('tableId');
+
+    // Cập nhật link đăng nhập
+    const loginLink = document.getElementById('login-link');
+    if (loginLink && redirectFrom) {
+      let logUrl = `./login.html?from=${redirectFrom}`;
+      if (tableId) logUrl += `&tableId=${tableId}`;
+      loginLink.href = logUrl;
+    }
+
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fullName = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const errorMessage = document.getElementById('error-message');
+
+      if (password !== confirmPassword) {
+        if (errorMessage) {
+          errorMessage.textContent = 'Mật khẩu xác nhận không khớp!';
+          errorMessage.classList.remove('hidden');
+        }
+        return;
+      }
+
+      // 1. Thử đăng ký tài khoản qua API backend
+      try {
+        const response = await fetch('http://localhost:8080/api/auth/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+            fullName: fullName,
+            phone: phone
+          })
+        });
+
+        if (response.ok) {
+          // Tự động đăng nhập sau khi đăng ký thành công
+          const signinRes = await fetch('http://localhost:8080/api/auth/signin', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: email, password: password })
+          });
+
+          if (signinRes.ok) {
+            const data = await signinRes.json();
+            const userObj = {
+              id: data.id,
+              username: username || data.username.split('@')[0],
+              fullName: fullName,
+              email: email,
+              phone: phone,
+              role: data.role.replace('ROLE_', '')
+            };
+            localStorage.setItem('user', JSON.stringify(userObj));
+            localStorage.setItem('token', data.token);
+
+            // Chuyển hướng
+            if (redirectFrom) {
+              let dest = `./${redirectFrom}`;
+              if (tableId) dest += `?tableId=${tableId}`;
+              window.location.href = dest;
+            } else {
+              window.location.href = './index.html';
+            }
+            return;
+          }
+        } else {
+          const errData = await response.json();
+          if (errorMessage) {
+            errorMessage.textContent = errData.message || 'Email đã tồn tại hoặc thông tin không hợp lệ!';
+            errorMessage.classList.remove('hidden');
+          }
+          return;
+        }
+      } catch (err) {
+        console.warn("Backend offline, sử dụng chế độ mock local.");
+      }
+
+      // Đăng ký thành công -> Lưu mock user và đăng nhập thẳng (Chế độ offline)
+      const mockUser = {
+        username: username,
+        fullName: fullName,
+        email: email,
+        phone: phone,
+        role: 'CUSTOMER'
+      };
+      
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      localStorage.setItem('token', 'mock-registered-customer-token-999');
+
+      // Chuyển hướng
+      if (redirectFrom) {
+        let dest = `./${redirectFrom}`;
+        if (tableId) dest += `?tableId=${tableId}`;
+        window.location.href = dest;
+      } else {
+        window.location.href = './index.html';
+      }
+    });
+  </script>
+</body>
+</html>

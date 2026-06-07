@@ -1,52 +1,45 @@
 package com.coffee.backend.domain.model;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "reservations")
+@Document(collection = "reservations")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Reservation {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @DBRef
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "table_id", nullable = false)
+    @DBRef
     private CoffeeTable coffeeTable;
 
-    @Column(nullable = false)
     private LocalDateTime reservationDate; // Start time
 
-    @Column(nullable = false)
     private LocalDateTime endTime;
 
-    @Column(nullable = false)
     private Integer guestCount;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private ReservationStatus status;
 
     private String note;
 
-    @CreationTimestamp
+    @CreatedDate
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 }

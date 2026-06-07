@@ -28,20 +28,17 @@ public class CoffeeTableService {
                 .orElseThrow(() -> new RuntimeException("Table not found with id: " + id));
     }
 
-    @Transactional
     public CoffeeTable createTable(CoffeeTable table) {
         table.setStatus(TableStatus.AVAILABLE);
         return coffeeTableRepository.save(table);
     }
 
-    @Transactional
     public CoffeeTable updateTableStatus(Long id, TableStatus status) {
         CoffeeTable table = getTableById(id);
         table.setStatus(status);
         return coffeeTableRepository.save(table);
     }
     
-    @Transactional
     public void deleteTable(Long id) {
         coffeeTableRepository.deleteById(id);
     }

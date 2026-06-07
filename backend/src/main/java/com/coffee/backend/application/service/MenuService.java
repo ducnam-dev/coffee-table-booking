@@ -31,12 +31,10 @@ public class MenuService {
                 .orElseThrow(() -> new RuntimeException("Menu item not found"));
     }
 
-    @Transactional
     public MenuItem createMenuItem(MenuItem menuItem) {
         return menuItemRepository.save(menuItem);
     }
 
-    @Transactional
     public MenuItem updateMenuItem(Long id, MenuItem updatedItem) {
         MenuItem existingItem = getMenuItemById(id);
         existingItem.setName(updatedItem.getName());
@@ -48,7 +46,6 @@ public class MenuService {
         return menuItemRepository.save(existingItem);
     }
 
-    @Transactional
     public void deleteMenuItem(Long id) {
         menuItemRepository.deleteById(id);
     }

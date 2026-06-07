@@ -30,7 +30,6 @@ public class ReservationService {
         return reservationRepository.findByUserId(userId);
     }
 
-    @Transactional
     public Reservation createReservation(Reservation request, String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -53,7 +52,6 @@ public class ReservationService {
         return reservationRepository.save(request);
     }
 
-    @Transactional
     public Reservation updateReservationStatus(Long id, ReservationStatus status) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found"));

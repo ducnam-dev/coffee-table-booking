@@ -1,12 +1,12 @@
 package com.coffee.backend.domain.repository;
 
 import com.coffee.backend.domain.model.OrderItem;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
+public interface OrderItemRepository extends MongoRepository<OrderItem, Long> {
     List<OrderItem> findByReservationId(Long reservationId);
 }
