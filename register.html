@@ -110,6 +110,14 @@
         return;
       }
 
+      if (password.length < 6) {
+        if (errorMessage) {
+          errorMessage.textContent = 'Mật khẩu phải chứa ít nhất 6 ký tự!';
+          errorMessage.classList.remove('hidden');
+        }
+        return;
+      }
+
       // 1. Thử đăng ký tài khoản qua API backend
       try {
         const response = await fetch('http://localhost:8080/api/auth/signup', {
@@ -159,9 +167,26 @@
             return;
           }
         } else {
-          const errData = await response.json();
+          let errorMsgText = 'Đăng ký không thành công!';
+          try {
+            const errData = await response.json();
+            if (errData.message) {
+              errorMsgText = errData.message;
+            } else if (errData.errors && errData.errors.length > 0) {
+              errorMsgText = errData.errors.map(err => {
+                if (err.field === 'password') return 'Mật khẩu phải từ 6 đến 40 ký tự';
+                if (err.field === 'email') return 'Email không đúng định dạng';
+                return err.defaultMessage;
+              }).join(', ');
+            } else if (errData.error) {
+              errorMsgText = errData.error;
+            }
+          } catch (e) {
+            errorMsgText = 'Email đã tồn tại hoặc thông tin không hợp lệ!';
+          }
+
           if (errorMessage) {
-            errorMessage.textContent = errData.message || 'Email đã tồn tại hoặc thông tin không hợp lệ!';
+            errorMessage.textContent = errorMsgText;
             errorMessage.classList.remove('hidden');
           }
           return;
