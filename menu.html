@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thực Đơn - Pam Coffee & Tea</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+    }
+  </style>
+</head>
+<body class="flex min-h-screen flex-col bg-stone-50 font-sans text-stone-800 antialiased selection:bg-amber-600 selection:text-white">
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-50 border-b border-stone-200 bg-white/80 backdrop-blur-md">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+      <!-- Logo -->
+      <a href="./index.html" class="flex items-center gap-2 group">
+        <img src="./assets/logo.png" alt="Pam Coffee & Tea" class="h-10 w-10 rounded-full object-cover shadow-md transition-transform duration-300 group-hover:scale-105" />
+        <span class="text-xl font-bold tracking-tight text-stone-900">
+          Pam Coffee <span class="text-amber-600">& Tea</span>
+        </span>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden md:flex items-center gap-8">
+        <a href="./index.html" class="text-sm font-semibold transition-colors duration-200 text-stone-600 hover:text-amber-600">Trang chủ</a>
+        <a href="./menu.html" class="text-sm font-semibold transition-colors duration-200 text-amber-600">Thực đơn</a>
+        <a href="./tables.html" class="text-sm font-semibold transition-colors duration-200 text-stone-600 hover:text-amber-600">Xem bàn trống</a>
+        <a href="#" onclick="handleBookingRedirect(event)" class="text-sm font-semibold transition-colors duration-200 text-stone-600 hover:text-amber-600">Đặt bàn ngay</a>
+        <a href="#" onclick="showBookingsModal(event)" class="text-sm font-semibold transition-colors duration-200 text-stone-600 hover:text-amber-600">Lịch sử đặt</a>
+      </nav>
+
+      <!-- User Profile / Auth buttons (Desktop) -->
+      <div class="hidden md:flex items-center gap-4">
+        <!-- Khi chưa đăng nhập -->
+        <div id="header-guest-container" class="flex items-center gap-3">
+          <a href="./login.html" class="text-sm font-semibold text-stone-600 hover:text-amber-600 transition-colors">Đăng nhập</a>
+          <a href="./register.html" class="rounded-xl bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-amber-600/10 hover:bg-amber-700 hover:shadow-amber-600/20 active:scale-95 transition-all duration-200">Đăng ký</a>
+        </div>
+        <!-- Khi đã đăng nhập (sẽ được main.js render động) -->
+        <div id="header-user-container" class="hidden items-center gap-4"></div>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" class="flex h-10 w-10 items-center justify-center rounded-lg border border-stone-200 text-stone-600 hover:bg-stone-50 md:hidden transition-colors">
+        <svg id="menu-icon-open" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg id="menu-icon-close" class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Menu Dropdown -->
+  <div id="mobile-menu-dropdown" class="hidden md:hidden border-b border-stone-200 bg-white px-4 py-3">
+    <div class="flex flex-col gap-3">
+      <a href="./index.html" class="text-sm font-semibold py-1.5 text-stone-600 hover:text-amber-600">Trang chủ</a>
+      <a href="./menu.html" class="text-sm font-semibold py-1.5 text-amber-600">Thực đơn</a>
+      <a href="./tables.html" class="text-sm font-medium py-1.5 text-stone-600 hover:text-amber-600">Xem bàn</a>
+      <a href="#" onclick="handleBookingRedirect(event)" class="text-sm font-medium py-1.5 text-stone-600 hover:text-amber-600">Đặt bàn</a>
+      <a href="#" onclick="showBookingsModal(event)" class="text-sm font-medium py-1.5 text-stone-600 hover:text-amber-600">Lịch sử đặt</a>
+      
+      <div class="border-t border-stone-100 pt-3 flex flex-col gap-2">
+        <!-- Khi chưa đăng nhập (Mobile) -->
+        <div id="mobile-guest-container" class="flex gap-2 w-full">
+          <a href="./login.html" class="flex-1 rounded-xl border border-stone-200 py-2.5 text-center text-sm font-semibold text-stone-600 hover:bg-stone-50 transition-colors">Đăng nhập</a>
+          <a href="./register.html" class="flex-1 rounded-xl bg-amber-600 py-2.5 text-center text-sm font-semibold text-white shadow-md hover:bg-amber-700 transition-colors">Đăng ký</a>
+        </div>
+        <!-- Khi đã đăng nhập (Mobile) -->
+        <div id="mobile-user-container" class="hidden flex flex-col gap-2 w-full"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Header -->
+  <section class="relative overflow-hidden bg-stone-900 py-16 text-white text-center">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-900/50 via-stone-900 to-stone-950"></div>
+    <div class="absolute -top-40 right-10 h-[400px] w-[400px] rounded-full bg-amber-600/10 blur-[100px]"></div>
+    <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-4">
+      <span class="text-xs font-bold uppercase tracking-widest text-amber-500">Hương vị trứ danh</span>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-5xl">Thực Đơn Của Quán</h1>
+      <p class="mx-auto max-w-lg text-sm text-stone-300">
+        Khám phá danh sách các loại đồ uống tuyệt hảo và bánh ngọt đậm vị, mang đến cho bạn sự sảng khoái trọn vẹn nhất.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 pb-20">
+    <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-12">
+      <!-- Category Tabs -->
+      <div class="flex flex-wrap justify-center gap-2" id="menu-category-tabs">
+        <!-- Dynamic Category tabs -->
+      </div>
+
+      <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3" id="menu-container">
+        <!-- Menu items loaded dynamically -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-stone-200 bg-stone-900 text-stone-400">
+    <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 text-center text-xs">
+      &copy; <span id="footer-year">2026</span> Pam Coffee & Tea. All rights reserved. Hotline: 0961377823.
+    </div>
+  </footer>
+
+  <script src="./js/main.js"></script>
+  <script>
+    // Mock Data cho Menu
+    const fallbackMenu = [
+      { id: '1', name: 'Trà Sữa Gạo Rang', category: 'Trà Sữa', price: 18000, description: 'Trà sữa gạo rang thơm bùi, ngọt ngào đặc trưng.' },
+      { id: '2', name: 'Trà Sữa Thái', category: 'Trà Sữa', price: 15000, description: 'Trà sữa Thái xanh/đỏ thơm mát đậm đà vị trà thảo mộc.' },
+      { id: '3', name: 'Trà Sữa Môn', category: 'Trà Sữa', price: 15000, description: 'Trà sữa khoai môn ngọt bùi, béo ngậy sắc tím.' },
+      { id: '4', name: 'Trà Sữa Socola', category: 'Trà Sữa', price: 15000, description: 'Trà sữa hương vị Socola đậm vị đắng ngọt hòa quyện.' },
+      { id: '5', name: 'Trà Sữa Truyền Thống', category: 'Trà Sữa', price: 15000, description: 'Trà sữa truyền thống thơm ngon đậm vị trà béo vị sữa.' },
+      { id: '6', name: 'Ca Cao Dầm Trân Châu', category: 'Ca Cao', price: 20000, description: 'Ca cao dầm đậm đặc kèm trân châu dai ngon sần sật.' },
+      { id: '7', name: 'Sữa Tươi Dâu Tằm', category: 'Sữa Tươi', price: 20000, description: 'Sữa tươi béo ngậy quyện mứt dâu tằm chua ngọt tự nhiên.' },
+      { id: '8', name: 'Sữa Tươi Việt Quất', category: 'Sữa Tươi', price: 20000, description: 'Sữa tươi thơm béo kết hợp sốt việt quất chua ngọt tươi mát.' },
+      { id: '9', name: 'Sữa Tươi Trân Châu Đường Đen', category: 'Sữa Tươi', price: 20000, description: 'Sữa tươi trân châu đường đen trứ danh ngọt ngào thơm ngon.' },
+      { id: '10', name: 'Trà Đào', category: 'Trà Trái Cây', price: 15000, description: 'Trà đào thơm thanh mát cùng những lát đào giòn ngọt.' },
+      { id: '11', name: 'Trà Tắc', category: 'Trà Trái Cây', price: 15000, description: 'Trà tắc/quất chua chua ngọt ngọt giải nhiệt cực đã.' },
+      { id: '12', name: 'Trà Dâu', category: 'Trà Trái Cây', price: 15000, description: 'Trà dâu tây tươi mát ngập tràn vị dâu ngọt ngào.' }
+    ];
+
+    let fullMenuData = [];
+    let selectedMenuCategory = 'ALL';
+
+    function getMenuItemImage(item) {
+      if (item.imageUrl && !item.imageUrl.includes('./assets')) {
+        return item.imageUrl;
+      }
+      const name = item.name.toLowerCase();
+      if (name.includes('gạo rang')) return 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&q=80&w=600';
+      if (name.includes('thái')) return 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&q=80&w=600';
+      if (name.includes('môn')) return 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&q=80&w=600';
+      if (name.includes('socola')) return 'https://images.unsplash.com/photo-1541658016709-82535e94bc69?auto=format&fit=crop&q=80&w=600';
+      if (name.includes('truyền thống')) return 'https://images.unsplash.com/photo-1507133750040-4a8f57021571?auto=format&fit=crop&q=80&w=600';
+      if (name.includes('ca cao')) return 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&q=80&w=600';
+      if (name.includes('dâu tằm')) return 'https://images.unsplash.com/photo-1553787499-6f9133860278?auto=format&fit=crop&q=80&w=600';
+      if (name.includes('việt quất')) return 'https://images.unsplash.com/photo-1603569283847-be1519e83531?auto=format&fit=crop&q=80&w=600';
+      if (name.includes('đường đen')) return 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&q=80&w=600';
+      if (name.includes('đào')) return 'https://images.unsplash.com/photo-1497534446932-c925b458314e?auto=format&fit=crop&q=80&w=600';
+      if (name.includes('tắc')) return 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&q=80&w=600';
+      if (name.includes('dâu')) return 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=600';
+      
+      return 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=600';
+    }
+
+    async function loadAndRenderMenu() {
+      try {
+        const res = await fetch('http://localhost:8080/api/menu');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            fullMenuData = data;
+          }
+        }
+      } catch (err) {
+        console.warn("Backend offline, sử dụng menu giả lập local.");
+      }
+
+      if (fullMenuData.length === 0) {
+        fullMenuData = fallbackMenu;
+      }
+
+      const categories = ['ALL', ...new Set(fullMenuData.map(item => item.category))];
+
+      const tabsContainer = document.getElementById('menu-category-tabs');
+      if (tabsContainer) {
+        tabsContainer.innerHTML = categories.map(cat => {
+          const isActive = selectedMenuCategory === cat;
+          const btnClass = isActive 
+            ? 'bg-amber-600 text-white font-bold' 
+            : 'bg-white text-stone-600 hover:bg-stone-50 font-medium border border-stone-200';
+          const label = cat === 'ALL' ? 'Tất cả' : cat;
+          return `
+            <button onclick="filterMenuCategory('${cat}')" class="rounded-xl px-4 py-2 text-xs shadow-sm transition-all duration-200 active:scale-95 ${btnClass}">
+              ${label}
+            </button>
+          `;
+        }).join('');
+      }
+
+      const menuContainer = document.getElementById('menu-container');
+      if (menuContainer) {
+        const filtered = selectedMenuCategory === 'ALL' 
+          ? fullMenuData 
+          : fullMenuData.filter(item => item.category === selectedMenuCategory);
+
+        menuContainer.innerHTML = filtered.map(item => {
+          const priceVal = typeof item.price === 'number' 
+            ? item.price 
+            : parseFloat(item.price);
+          const formattedPrice = priceVal.toLocaleString('vi-VN') + 'đ';
+          const imgUrl = getMenuItemImage(item);
+          const tagHtml = selectedMenuCategory === 'ALL' 
+            ? `<span class="relative z-10 self-start rounded-full bg-amber-600 text-white px-3 py-1 text-xs font-bold shadow-sm">${item.category}</span>` 
+            : '<span></span>';
+
+          return `
+            <div class="group flex flex-col justify-between overflow-hidden rounded-3xl bg-white border border-stone-200/60 shadow-sm transition-all duration-300 hover:shadow-lg animate-in fade-in duration-300">
+              <div class="h-48 bg-cover bg-center p-6 flex flex-col justify-between relative overflow-hidden transition-transform duration-300" style="background-image: url('${imgUrl}')">
+                <div class="absolute inset-0 bg-stone-900/30"></div>
+                ${tagHtml}
+                
+                <div class="relative z-10 flex justify-end items-end">
+                  <button class="flex h-8 w-8 items-center justify-center rounded-full bg-white text-stone-600 hover:text-rose-500 shadow-md transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="p-6 space-y-3 flex-1 flex flex-col justify-between">
+                <div class="space-y-1">
+                  <h3 class="text-lg font-bold text-stone-900 group-hover:text-amber-600 transition-colors">
+                    ${item.name}
+                  </h3>
+                  <p class="text-sm text-stone-500 line-clamp-2 leading-relaxed">
+                    ${item.description || 'Hương vị tuyệt hảo pha chế tinh tế chuẩn gu.'}
+                  </p>
+                </div>
+                <div class="flex items-center justify-between pt-4 border-t border-stone-100">
+                  <span class="text-xl font-extrabold text-amber-700">${formattedPrice}</span>
+                  <span class="text-xs text-stone-400 font-semibold">Tất cả cỡ ly</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    window.filterMenuCategory = function(cat) {
+      selectedMenuCategory = cat;
+      loadAndRenderMenu();
+    };
+
+    function handleBookingRedirect(e, tableId = '') {
+      if (e) e.preventDefault();
+      const isLoggedIn = checkAuth();
+      if (isLoggedIn) {
+        window.location.href = `./booking.html${tableId ? '?tableId=' + tableId : ''}`;
+      } else {
+        window.location.href = `./login.html?from=booking.html${tableId ? '&tableId=' + tableId : ''}`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('footer-year').textContent = new Date().getFullYear();
+      loadAndRenderMenu();
+    });
+  </script>
+</body>
+</html>
