@@ -26,22 +26,38 @@ public class DatabaseSeeder implements CommandLineRunner {
             User admin = User.builder()
                     .fullName("Quản Trị Pam")
                     .email("admin@pamcoffeetea.com")
+                    .username("admin")
                     .password(passwordEncoder.encode("admin"))
                     .phone("0901234567")
                     .role(Role.ROLE_ADMIN)
                     .build();
             userRepository.save(admin);
+        } else {
+            userRepository.findByEmail("admin@pamcoffeetea.com").ifPresent(admin -> {
+                if (admin.getUsername() == null) {
+                    admin.setUsername("admin");
+                    userRepository.save(admin);
+                }
+            });
         }
 
         if (!userRepository.existsByEmail("khachhang@gmail.com")) {
             User customer = User.builder()
                     .fullName("Nguyễn Khách Hàng")
                     .email("khachhang@gmail.com")
+                    .username("customer")
                     .password(passwordEncoder.encode("customer"))
                     .phone("0901234567")
                     .role(Role.ROLE_CUSTOMER)
                     .build();
             userRepository.save(customer);
+        } else {
+            userRepository.findByEmail("khachhang@gmail.com").ifPresent(customer -> {
+                if (customer.getUsername() == null) {
+                    customer.setUsername("customer");
+                    userRepository.save(customer);
+                }
+            });
         }
 
         // Seed Coffee Tables

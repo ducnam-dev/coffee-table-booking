@@ -2,14 +2,17 @@ package com.coffee.backend.infrastructure.persistence;
 
 import com.coffee.backend.application.service.SequenceGeneratorService;
 import com.coffee.backend.domain.model.*;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.mapping.event.BeforeConvertCallback;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class EntityIdBeforeConvertCallback implements BeforeConvertCallback<Object> {
     private final SequenceGeneratorService sequenceGeneratorService;
+
+    public EntityIdBeforeConvertCallback(@Lazy SequenceGeneratorService sequenceGeneratorService) {
+        this.sequenceGeneratorService = sequenceGeneratorService;
+    }
 
     @Override
     public Object onBeforeConvert(Object entity, String collection) {

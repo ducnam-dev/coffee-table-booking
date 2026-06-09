@@ -416,7 +416,8 @@ function switchTab(tabName) {
     dashboard: { el: document.getElementById('tab-content-dashboard'), btn: document.getElementById('tab-btn-dashboard'), title: 'Tổng Quan Hệ Thống', desc: 'Chào mừng ngày mới! Dưới đây là hiệu suất vận hành của quán.' },
     bookings: { el: document.getElementById('tab-content-bookings'), btn: document.getElementById('tab-btn-bookings'), title: 'Quản Lý Đặt Bàn', desc: 'Xem danh sách chi tiết và kiểm duyệt các yêu cầu giữ chỗ.' },
     tables: { el: document.getElementById('tab-content-tables'), btn: document.getElementById('tab-btn-tables'), title: 'Quản Lý Bàn', desc: 'Thiết lập danh sách khu vực bàn ghế và cập nhật trạng thái sử dụng.' },
-    menu: { el: document.getElementById('tab-content-menu'), btn: document.getElementById('tab-btn-menu'), title: 'Quản Lý Thực Đơn', desc: 'Xem danh sách thực đơn đồ uống & món ngọt của Pam Coffee.' }
+    menu: { el: document.getElementById('tab-content-menu'), btn: document.getElementById('tab-btn-menu'), title: 'Quản Lý Thực Đơn', desc: 'Xem danh sách thực đơn đồ uống & món ngọt của Pam Coffee.' },
+    users: { el: document.getElementById('tab-content-users'), btn: document.getElementById('tab-btn-users'), title: 'Quản Lý Tài Khoản', desc: 'Xem, tìm kiếm, khóa/mở khóa, và cập nhật thông tin tài khoản thành viên.' }
   };
 
   // Ẩn tất cả và bỏ class active
@@ -447,6 +448,8 @@ function switchTab(tabName) {
     loadTables();
   } else if (tabName === 'menu') {
     loadMenu();
+  } else if (tabName === 'users') {
+    loadUsers();
   }
 }
 
@@ -812,6 +815,224 @@ document.getElementById('menu-form').addEventListener('submit', async (e) => {
 });
 
 
+// --- USER ACTIONS (MODAL & API) ---
+
+// State for users
+let usersList = [];
+let userSearchTimeout = null;
+
+// Load users from API
+async function loadUsers() {
+  const search = document.getElementById('user-search') ? document.getElementById('user-search').value.trim() : '';
+  const role = document.getElementById('user-filter-role') ? document.getElementById('user-filter-role').value : '';
+  const statusSelect = document.getElementById('user-filter-status') ? document.getElementById('user-filter-status').value : '';
+  
+  let url = `${API_BASE_URL}/users?`;
+  if (search) url += `search=${encodeURIComponent(search)}&`;
+  if (role) url += `role=${encodeURIComponent(role)}&`;
+  if (statusSelect === 'locked') url += `locked=true&`;
+  if (statusSelect === 'active') url += `locked=false&`;
+
+  try {
+    const res = await fetch(url, {
+      headers: getHeaders()
+    });
+    if (res.ok) {
+      usersList = await res.json();
+    }
+  } catch (e) {
+    console.error("Lỗi khi tải danh sách người dùng:", e);
+  }
+  renderUsers();
+}
+
+// Render users in table
+function renderUsers() {
+  const tbody = document.getElementById('admin-users-tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = usersList.map(u => {
+    let roleText = 'Khách Hàng';
+    if (u.role === 'ROLE_ADMIN') roleText = 'Quản Trị Viên';
+    else if (u.role === 'ROLE_STAFF') roleText = 'Nhân Viên';
+    
+    const isLocked = u.locked;
+    const statusText = isLocked ? 'Bị khóa' : 'Hoạt động';
+    const statusClass = isLocked ? 'bg-rose-50 text-rose-700 ring-rose-600/10' : 'bg-emerald-50 text-emerald-700 ring-emerald-600/10';
+
+    const createdAtStr = u.createdAt ? new Date(u.createdAt).toLocaleDateString('vi-VN') : 'N/A';
+
+    return `
+      <tr class="hover:bg-stone-50/50 transition-colors">
+        <td class="px-6 py-4 font-bold text-stone-900">${u.id}</td>
+        <td class="px-6 py-4 font-semibold text-stone-850">${u.fullName || ''}</td>
+        <td class="px-6 py-4 text-stone-700">${u.username || ''}</td>
+        <td class="px-6 py-4 text-stone-700">${u.email || ''}</td>
+        <td class="px-6 py-4 text-stone-600">${u.phone || ''}</td>
+        <td class="px-6 py-4 text-stone-600 font-medium">${roleText}</td>
+        <td class="px-6 py-4"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${statusClass}">${statusText}</span></td>
+        <td class="px-6 py-4 text-stone-600 text-xs">${createdAtStr}</td>
+        <td class="px-6 py-4 text-right">
+          <div class="flex justify-end gap-2">
+            <button onclick="toggleLockUser(${u.id}, ${!isLocked})" class="flex h-8 w-8 items-center justify-center rounded-lg border border-stone-200 text-stone-500 hover:text-amber-600 hover:border-amber-200 hover:bg-amber-50 transition-all" title="${isLocked ? 'Mở khóa' : 'Khóa'}">
+              ${isLocked 
+                ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>`
+              }
+            </button>
+            <button onclick="editUser(${u.id})" class="flex h-8 w-8 items-center justify-center rounded-lg border border-stone-200 text-stone-500 hover:text-amber-600 hover:border-amber-200 hover:bg-amber-50 transition-all" title="Sửa">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+            </button>
+            <button onclick="deleteUser(${u.id})" class="flex h-8 w-8 items-center justify-center rounded-lg border border-stone-200 text-stone-500 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-all" title="Xóa">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// User Debounce Search
+window.debounceUserSearch = function() {
+  clearTimeout(userSearchTimeout);
+  userSearchTimeout = setTimeout(() => {
+    loadUsers();
+  }, 300);
+};
+
+// Open user modal
+window.openUserModal = function() {
+  document.getElementById('user-form-id').value = '';
+  document.getElementById('user-fullname').value = '';
+  document.getElementById('user-username').value = '';
+  document.getElementById('user-username').disabled = false;
+  document.getElementById('user-email').value = '';
+  document.getElementById('user-password').value = '';
+  document.getElementById('user-password-container').classList.remove('hidden');
+  document.getElementById('user-password').required = true;
+  document.getElementById('user-phone').value = '';
+  document.getElementById('user-role').value = 'ROLE_CUSTOMER';
+  document.getElementById('user-status-container').classList.add('hidden');
+  document.getElementById('user-modal-title').textContent = 'Thêm Tài Khoản Mới';
+  document.getElementById('user-modal').classList.remove('hidden');
+};
+
+window.closeUserModal = function() {
+  document.getElementById('user-modal').classList.add('hidden');
+};
+
+// Edit user modal
+window.editUser = function(id) {
+  const u = usersList.find(item => item.id === id);
+  if (!u) return;
+
+  document.getElementById('user-form-id').value = u.id;
+  document.getElementById('user-fullname').value = u.fullName || '';
+  document.getElementById('user-username').value = u.username || '';
+  document.getElementById('user-username').disabled = true; // Không được sửa username
+  document.getElementById('user-email').value = u.email || '';
+  document.getElementById('user-password').value = '';
+  document.getElementById('user-password-container').classList.add('hidden'); // Sửa không cần nhập lại pass
+  document.getElementById('user-password').required = false;
+  document.getElementById('user-phone').value = u.phone || '';
+  document.getElementById('user-role').value = u.role || 'ROLE_CUSTOMER';
+  
+  document.getElementById('user-status-container').classList.remove('hidden');
+  document.getElementById('user-status').value = u.locked ? 'locked' : 'active';
+  
+  document.getElementById('user-modal-title').textContent = 'Sửa Thông Tin Tài Khoản';
+  document.getElementById('user-modal').classList.remove('hidden');
+};
+
+// Toggle Lock User
+window.toggleLockUser = async function(id, lock) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/users/${id}/lock?lock=${lock}`, {
+      method: 'PATCH',
+      headers: getHeaders()
+    });
+    if (res.ok) {
+      alert(lock ? 'Đã khóa tài khoản thành công!' : 'Đã mở khóa tài khoản thành công!');
+      loadUsers();
+    } else {
+      const err = await res.json();
+      alert(err.message || 'Lỗi khi cập nhật trạng thái khóa');
+    }
+  } catch (e) {
+    alert('Không thể kết nối đến máy chủ');
+  }
+};
+
+// Soft Delete User
+window.deleteUser = async function(id) {
+  if (confirm('Bạn có chắc chắn muốn xóa (xóa mềm) tài khoản này?')) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+      });
+      if (res.ok) {
+        alert('Đã xóa mềm tài khoản thành công!');
+        loadUsers();
+      } else {
+        const err = await res.json();
+        alert(err.message || 'Lỗi khi xóa tài khoản');
+      }
+    } catch (e) {
+      alert('Không thể kết nối đến máy chủ');
+    }
+  }
+};
+
+// Submit form
+document.getElementById('user-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const idVal = document.getElementById('user-form-id').value;
+  const fullName = document.getElementById('user-fullname').value.trim();
+  const username = document.getElementById('user-username').value.trim();
+  const email = document.getElementById('user-email').value.trim();
+  const password = document.getElementById('user-password').value;
+  const phone = document.getElementById('user-phone').value.trim();
+  const role = document.getElementById('user-role').value;
+  
+  const userObj = {
+    fullName,
+    email,
+    phone,
+    role
+  };
+
+  if (!idVal) {
+    userObj.username = username;
+    userObj.password = password;
+  } else {
+    userObj.locked = document.getElementById('user-status').value === 'locked';
+  }
+
+  const method = idVal ? 'PUT' : 'POST';
+  const url = idVal ? `${API_BASE_URL}/users/${idVal}` : `${API_BASE_URL}/users`;
+
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: getHeaders(),
+      body: JSON.stringify(userObj)
+    });
+
+    if (res.ok) {
+      closeUserModal();
+      loadUsers();
+    } else {
+      const err = await res.json();
+      alert(err.message || 'Có lỗi xảy ra, vui lòng kiểm tra lại');
+    }
+  } catch (err) {
+    alert('Không thể lưu thông tin, vui lòng kiểm tra kết nối');
+  }
+});
+
+
 // Khởi chạy khi load trang
 document.addEventListener('DOMContentLoaded', () => {
   // Tab click listeners
@@ -819,11 +1040,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnBookings = document.getElementById('tab-btn-bookings');
   const btnTables = document.getElementById('tab-btn-tables');
   const btnMenu = document.getElementById('tab-btn-menu');
+  const btnUsers = document.getElementById('tab-btn-users');
   
   if (btnDashboard) btnDashboard.addEventListener('click', () => switchTab('dashboard'));
   if (btnBookings) btnBookings.addEventListener('click', () => switchTab('bookings'));
   if (btnTables) btnTables.addEventListener('click', () => switchTab('tables'));
   if (btnMenu) btnMenu.addEventListener('click', () => switchTab('menu'));
+  if (btnUsers) btnUsers.addEventListener('click', () => switchTab('users'));
 
   // Mobile select tab switcher
   const mobileSelect = document.getElementById('mobile-tab-select');

@@ -23,6 +23,8 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password;
 
+    private boolean locked;
+
     private Collection<? extends GrantedAuthority> authorities;
 
     public static UserDetailsImpl build(User user) {
@@ -31,6 +33,7 @@ public class UserDetailsImpl implements UserDetails {
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
+                user.isLocked(),
                 authorities);
     }
 
@@ -42,7 +45,7 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public boolean isAccountNonExpired() { return true; }
     @Override
-    public boolean isAccountNonLocked() { return true; }
+    public boolean isAccountNonLocked() { return !locked; }
     @Override
     public boolean isCredentialsNonExpired() { return true; }
     @Override

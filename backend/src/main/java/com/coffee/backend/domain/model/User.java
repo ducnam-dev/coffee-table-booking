@@ -26,11 +26,19 @@ public class User {
     @Indexed(unique = true)
     private String email;
 
+    @Indexed(unique = true)
+    private String username;
+
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     private String phone;
 
     private Role role;
+
+    private boolean locked;
+
+    private boolean deleted;
 
     @CreatedDate
     private LocalDateTime createdAt;

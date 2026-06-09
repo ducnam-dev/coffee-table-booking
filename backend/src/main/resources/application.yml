@@ -1,4 +1,6 @@
 spring:
+  main:
+    allow-circular-references: true
   data:
     mongodb:
       uri: mongodb://localhost:27017/coffee_shop

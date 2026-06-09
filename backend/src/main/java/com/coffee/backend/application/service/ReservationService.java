@@ -31,7 +31,7 @@ public class ReservationService {
     }
 
     public Reservation createReservation(Reservation request, String userEmail) {
-        User user = userRepository.findByEmail(userEmail)
+        User user = userRepository.findByEmailAndDeletedFalse(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
         CoffeeTable table = tableRepository.findById(request.getCoffeeTable().getId())
