@@ -6,7 +6,7 @@ Hệ thống được thiết kế theo cơ chế **Hybrid** (Đồng bộ hóa 
 
 ---
 
-## 🌟 Tính năng chính
+## Tính năng chính
 
 ### 1. Phía Khách hàng (Customer Interface)
 * **Trang chủ:** Giới thiệu quán, hiển thị 3 thực đơn nổi bật, các tiện ích nổi bật.
@@ -25,16 +25,16 @@ Hệ thống được thiết kế theo cơ chế **Hybrid** (Đồng bộ hóa 
 ## 🛠️ Công nghệ sử dụng
 
 * **Frontend:**
-  * HTML5 (Cấu trúc giao diện ngữ nghĩa)
-  * CSS3 (Thiết kế phong cách hiện đại)
-  * TailwindCSS (Styling nhanh và đáp ứng tốt trên cả PC & Mobile)
+  * HTML5 
+  * CSS3 
+  * TailwindCSS 
   * JavaScript ES6+ (Xử lý logic động, tương tác APIs, LocalStorage fallback)
 * **Backend:**
   * Java Spring Boot 3
   * Spring Security & JWT (Bảo mật xác thực phân quyền Admin / Customer)
   * Spring Data MongoDB
 * **Database:**
-  * MongoDB (Cơ sở dữ liệu NoSQL lưu trữ lâu dài thực tế)
+  * MongoDB 
 
 ---
 
@@ -58,7 +58,7 @@ Hệ thống được thiết kế theo cơ chế **Hybrid** (Đồng bộ hóa 
    ```bash
    ./mvnw spring-boot:run
    ```
-*Server Backend sẽ chạy ở cổng `8080` và tự động khởi tạo cơ sở dữ liệu `coffee_shop` cùng các dữ liệu mẫu (`DatabaseSeeder`).*
+
 
 ### 2. Khởi chạy Giao diện (Frontend)
 1. Di chuyển vào thư mục frontend:
@@ -77,7 +77,7 @@ Hệ thống được thiết kế theo cơ chế **Hybrid** (Đồng bộ hóa 
 
 ---
 
-## 🔐 Tài khoản thử nghiệm (Default Credentials)
+## 🔐 Tài khoản thử nghiệm 
 
 Hệ thống đã được seeder sẵn tài khoản mẫu để bạn kiểm tra các chức năng phân quyền:
 
