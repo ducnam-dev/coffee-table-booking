@@ -36,9 +36,19 @@ public class User {
 
     private Role role;
 
-    private boolean locked;
+    @Builder.Default
+    private Boolean locked = false;
 
-    private boolean deleted;
+    @Builder.Default
+    private Boolean deleted = false;
+
+    public Boolean isLocked() {
+        return locked != null && locked;
+    }
+
+    public Boolean isDeleted() {
+        return deleted != null && deleted;
+    }
 
     @CreatedDate
     private LocalDateTime createdAt;

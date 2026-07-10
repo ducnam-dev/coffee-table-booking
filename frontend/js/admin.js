@@ -1,8 +1,8 @@
 // admin.js - Logic for admin dashboard (Tabs, Filters, Tables, Menu, and Backend API)
 
-// 1. Guard Check: Phải là Admin mới được xem trang này
+// 1. Guard Check: Phải là Admin hoặc Nhân Viên mới được xem trang này
 const user = getCurrentUser();
-if (!checkAuth() || !user || user.role !== 'ADMIN') {
+if (!checkAuth() || !user || (user.role !== 'ADMIN' && user.role !== 'STAFF')) {
   alert('Bạn không có quyền truy cập trang quản trị này!');
   window.location.href = './index.html';
 }
@@ -86,6 +86,16 @@ async function loadTables() {
   updateDashboardStats();
 }
 
+// Helper to map menu item properties between frontend (available) and backend (isAvailable)
+function mapMenuItem(item) {
+  if (!item) return item;
+  return {
+    ...item,
+    available: item.isAvailable !== undefined ? item.isAvailable : item.available,
+    isAvailable: item.isAvailable !== undefined ? item.isAvailable : item.available
+  };
+}
+
 // Load danh sách Thực đơn
 async function loadMenu() {
   try {
@@ -93,7 +103,7 @@ async function loadMenu() {
     if (res.ok) {
       const data = await res.json();
       if (data && data.length > 0) {
-        menuList = data;
+        menuList = data.map(mapMenuItem);
       }
     }
   } catch (e) {
@@ -269,7 +279,7 @@ async function saveMenuApi(menuObj) {
     }
 
     if (res.ok) {
-      const savedMenu = await res.json();
+      const savedMenu = mapMenuItem(await res.json());
       if (isEdit) {
         menuList = menuList.map(m => m.id === savedMenu.id ? savedMenu : m);
       } else {
@@ -411,6 +421,11 @@ function updateDashboardStats() {
 
 // Đổi Tab
 function switchTab(tabName) {
+  if (tabName === 'users' && user.role !== 'ADMIN') {
+    alert('Bạn không có quyền truy cập tab quản lý tài khoản!');
+    switchTab('dashboard');
+    return;
+  }
   activeTab = tabName;
   const tabs = {
     dashboard: { el: document.getElementById('tab-content-dashboard'), btn: document.getElementById('tab-btn-dashboard'), title: 'Tổng Quan Hệ Thống', desc: 'Chào mừng ngày mới! Dưới đây là hiệu suất vận hành của quán.' },
@@ -787,6 +802,7 @@ document.getElementById('menu-form').addEventListener('submit', async (e) => {
     category: categoryVal,
     price: priceVal,
     description: descVal,
+    isAvailable: availVal,
     available: availVal
   };
 
@@ -1006,8 +1022,11 @@ document.getElementById('user-form').addEventListener('submit', async (e) => {
   if (!idVal) {
     userObj.username = username;
     userObj.password = password;
+    userObj.locked = false;
+    userObj.deleted = false;
   } else {
     userObj.locked = document.getElementById('user-status').value === 'locked';
+    userObj.deleted = false;
   }
 
   const method = idVal ? 'PUT' : 'POST';
@@ -1035,6 +1054,65 @@ document.getElementById('user-form').addEventListener('submit', async (e) => {
 
 // Khởi chạy khi load trang
 document.addEventListener('DOMContentLoaded', () => {
+  // Cập nhật thông tin profile của user đăng nhập vào sidebar và header
+  const sidebarAvatar = document.getElementById('admin-sidebar-avatar');
+  const sidebarName = document.getElementById('admin-sidebar-name');
+  const sidebarEmail = document.getElementById('admin-sidebar-email');
+  const sidebarTitle = document.getElementById('admin-sidebar-title');
+  const mobileTitle = document.getElementById('admin-mobile-title');
+  
+  if (user) {
+    if (sidebarAvatar) {
+      sidebarAvatar.textContent = user.username.substring(0, 2).toUpperCase();
+    }
+    if (sidebarName) {
+      sidebarName.textContent = user.fullName || user.username;
+    }
+    if (sidebarEmail) {
+      sidebarEmail.textContent = user.email || '';
+    }
+    if (sidebarTitle) {
+      sidebarTitle.textContent = user.role === 'ADMIN' ? 'Pam Admin' : 'Pam Staff';
+    }
+    if (mobileTitle) {
+      mobileTitle.textContent = user.role === 'ADMIN' ? 'Pam Admin' : 'Pam Staff';
+    }
+  }
+
+  // Nếu là STAFF thì ẩn chức năng quản lý tài khoản
+  if (user && user.role === 'STAFF') {
+    const btnUsers = document.getElementById('tab-btn-users');
+    if (btnUsers) btnUsers.classList.add('hidden');
+    
+    const mobileSelect = document.getElementById('mobile-tab-select');
+    if (mobileSelect) {
+      const userOpt = mobileSelect.querySelector('option[value="users"]');
+      if (userOpt) userOpt.remove();
+    }
+  }
+
+  // Ràng buộc trường menu-price chỉ được nhập số
+  const menuPriceInput = document.getElementById('menu-price');
+  if (menuPriceInput) {
+    menuPriceInput.addEventListener('keydown', (e) => {
+      // Cho phép Backspace, Delete, Tab, Escape, Enter
+      if ([46, 8, 9, 27, 13].indexOf(e.keyCode) !== -1 ||
+          // Cho phép Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+          (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+          (e.keyCode === 67 && (e.ctrlKey === true || e.metaKey === true)) ||
+          (e.keyCode === 86 && (e.ctrlKey === true || e.metaKey === true)) ||
+          (e.keyCode === 88 && (e.ctrlKey === true || e.metaKey === true)) ||
+          // Cho phép Home, End, Left, Right
+          (e.keyCode >= 35 && e.keyCode <= 39)) {
+        return;
+      }
+      // Chặn nếu không phải là số (0-9 trên bàn phím chính hoặc numpad)
+      if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+        e.preventDefault();
+      }
+    });
+  }
+
   // Tab click listeners
   const btnDashboard = document.getElementById('tab-btn-dashboard');
   const btnBookings = document.getElementById('tab-btn-bookings');

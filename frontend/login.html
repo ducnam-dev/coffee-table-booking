@@ -51,28 +51,8 @@
         </button>
       </form>
 
-      <!-- Divider -->
-      <div class="relative my-8 flex items-center justify-center">
-        <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-stone-200"></div>
-        </div>
-        <span class="relative bg-white px-3 text-xs font-bold uppercase tracking-widest text-stone-400">Tester / Developer</span>
-      </div>
-
-      <!-- Quick logins (Roles simulation) -->
-      <div class="grid grid-cols-2 gap-3">
-        <button onclick="handleQuickLogin('customer')" class="flex flex-col items-center justify-center rounded-2xl border border-stone-200 bg-stone-50/50 p-3.5 hover:bg-amber-50 hover:border-amber-200 transition-all duration-200 text-left">
-          <span class="text-xs font-bold text-stone-700">Vào vai</span>
-          <span class="text-sm font-bold text-amber-700 mt-1">Khách Hàng</span>
-        </button>
-        <button onclick="handleQuickLogin('admin')" class="flex flex-col items-center justify-center rounded-2xl border border-stone-200 bg-stone-50/50 p-3.5 hover:bg-amber-50 hover:border-amber-200 transition-all duration-200 text-left">
-          <span class="text-xs font-bold text-stone-700">Vào vai</span>
-          <span class="text-sm font-bold text-amber-700 mt-1">Quản Trị Viên</span>
-        </button>
-      </div>
-
       <!-- Back / Register links -->
-      <div class="mt-8 text-center text-sm">
+      <div class="mt-6 text-center text-sm">
         <span class="text-stone-500">Chưa có tài khoản?</span>
         <a id="register-link" href="./register.html" class="font-bold text-amber-600 hover:text-amber-700 ml-1 transition-colors">Đăng ký ngay</a>
       </div>
@@ -98,9 +78,15 @@
     function handleQuickLogin(role) {
       const mockUser = role === 'admin' 
         ? { id: 1, username: 'admin', fullName: 'Quản Trị Pam', role: 'ADMIN', email: 'admin@pamcoffeetea.com' }
-        : { id: 2, username: 'customer', fullName: 'Nguyễn Khách Hàng', role: 'CUSTOMER', email: 'khachhang@gmail.com' };
+        : role === 'staff'
+          ? { id: 3, username: 'staff', fullName: 'Nhân Viên Pam', role: 'STAFF', email: 'nhanvien@pamcoffeetea.com' }
+          : { id: 2, username: 'customer', fullName: 'Nguyễn Khách Hàng', role: 'CUSTOMER', email: 'khachhang@gmail.com' };
       
-      const mockToken = role === 'admin' ? 'mock-admin-token-12345' : 'mock-customer-token-12345';
+      const mockToken = role === 'admin' 
+        ? 'mock-admin-token-12345' 
+        : role === 'staff'
+          ? 'mock-staff-token-12345'
+          : 'mock-customer-token-12345';
       
       localStorage.setItem('user', JSON.stringify(mockUser));
       localStorage.setItem('token', mockToken);
@@ -115,7 +101,7 @@
         if (tableId) dest += `?tableId=${tableId}`;
         window.location.href = dest;
       } else {
-        if (user.role === 'ADMIN') {
+        if (user.role === 'ADMIN' || user.role === 'STAFF') {
           window.location.href = './admin.html';
         } else {
           window.location.href = './index.html';
@@ -172,8 +158,14 @@
       }
 
       // Cho phép đăng nhập bất kỳ tài khoản nào để dễ test khi backend offline
-      const isAdm = usernameInput.toLowerCase() === 'admin';
-      handleQuickLogin(isAdm ? 'admin' : 'customer');
+      const lowerUser = usernameInput.toLowerCase();
+      if (lowerUser.includes('admin')) {
+        handleQuickLogin('admin');
+      } else if (lowerUser.includes('staff')) {
+        handleQuickLogin('staff');
+      } else {
+        handleQuickLogin('customer');
+      }
     });
   </script>
 </body>

@@ -41,12 +41,13 @@ function updateHeader() {
       headerUserContainer.classList.remove('hidden');
       headerUserContainer.classList.add('flex');
       
-      const adminBtnHtml = user.role === 'ADMIN' 
+      const isStaffOrAdmin = user.role === 'ADMIN' || user.role === 'STAFF';
+      const adminBtnHtml = isStaffOrAdmin 
         ? `<a href="./admin.html" class="flex items-center gap-1.5 rounded-lg border border-amber-600/30 bg-amber-50 px-3.5 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100 transition-all">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
             </svg>
-            Trang Quản Trị
+            ${user.role === 'ADMIN' ? 'Trang Quản Trị' : 'Trang Nhân Viên'}
            </a>`
         : '';
 
@@ -76,7 +77,7 @@ function updateHeader() {
 
           <div class="flex flex-col text-right">
             <span class="text-sm font-semibold text-stone-900">${user.fullName || user.username}</span>
-            <span class="text-xs text-stone-500 capitalize">${user.role === 'ADMIN' ? 'Quản trị viên' : 'Khách hàng'}</span>
+            <span class="text-xs text-stone-500 capitalize">${user.role === 'ADMIN' ? 'Quản trị viên' : (user.role === 'STAFF' ? 'Nhân viên' : 'Khách hàng')}</span>
           </div>
           <div class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-800 font-bold uppercase shadow-sm">
             ${user.username.substring(0, 2)}
@@ -117,15 +118,15 @@ function updateHeader() {
     if (mobileUserContainer) {
       mobileUserContainer.classList.remove('hidden');
       
-      const adminBtnMobileHtml = user.role === 'ADMIN'
+      const adminBtnMobileHtml = isStaffOrAdmin
         ? `<a href="./admin.html" class="flex items-center justify-center gap-2 rounded-lg bg-amber-50 py-2.5 text-sm font-semibold text-amber-700 hover:bg-amber-100 transition-colors w-full mb-3">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
             </svg>
-            Trang Quản Trị
+            ${user.role === 'ADMIN' ? 'Trang Quản Trị' : 'Trang Nhân Viên'}
            </a>`
         : '';
-
+                
       mobileUserContainer.innerHTML = `
         ${adminBtnMobileHtml}
         <div class="flex items-center justify-between py-2 px-1">
