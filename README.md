@@ -1,109 +1,113 @@
 # Coffee Shop Table Booking System (Pam Coffee & Tea)
 
-Hệ thống quản lý và đặt bàn trực tuyến cho quán cà phê **Pam Coffee & Tea**, bao gồm giao diện khách hàng đặt bàn, xem thực đơn và bảng quản trị (Admin Dashboard) dành cho quản lý quán.
-
-Hệ thống được thiết kế theo cơ chế **Hybrid** (Đồng bộ hóa linh hoạt giữa Backend API và Trình duyệt Cache local), cho phép giao diện hoạt động mượt mà ngay cả khi backend ở chế độ offline.
+Hệ thống quản lý và đặt bàn trực tuyến cho quán cà phê **Pam Coffee & Tea** được xây dựng theo kiến trúc **MVP (Model - View - Presenter)** trên nền tảng **React Native**, kết hợp cùng **FastAPI Backend (Python)** và hỗ trợ đồng bộ dữ liệu thông minh (Online / Offline).
 
 ---
 
-## Tính năng chính
+## 🏛️ Kiến Trúc Dự Án: MVP (Model - View - Presenter)
 
-### 1. Phía Khách hàng (Customer Interface)
-* **Trang chủ:** Giới thiệu quán, hiển thị 3 thực đơn nổi bật, các tiện ích nổi bật.
-* **Đặt bàn trực tuyến:** Chọn sơ đồ bàn trực quan, điền thông tin đặt bàn (ngày giờ, số lượng khách, ghi chú), tùy chọn đặt trước thực đơn.
-* **Xem thực đơn:** Xem danh sách thực đơn phân theo nhóm danh mục (Trà Sữa, Ca Cao, Sữa Tươi, Trà Trái Cây) với mức giá rõ ràng.
-* **Sơ đồ bàn động:** Hiển thị trực quan vị trí bàn (cặp đôi, sân vườn, phòng lạnh, gác lửng) và trạng thái hiện tại (Còn trống / Đã đặt).
+Dự án phân tách độc lập và rành mạch giữa giao diện hiển thị, tầng xử lý trình diễn và tầng dữ liệu:
 
-### 2. Phía Quản lý (Admin Dashboard)
-* **Thống kê tổng quan:** Theo dõi doanh thu, số lượng đặt bàn, bàn đang sử dụng và món ăn bán chạy nhất bằng biểu đồ trực quan (Chart.js).
-* **Quản lý đặt bàn:** Xem danh sách khách hàng đặt bàn, phê duyệt (`CONFIRMED`) hoặc hủy (`CANCELLED`) lượt đặt.
-* **Quản lý danh sách bàn:** Thêm bàn mới, sửa đổi trạng thái bàn, xóa bàn và thiết lập thuộc tính bàn (gần cửa sổ, ngoài trời, ổ cắm điện, số ghế).
-* **Đồng bộ hóa tự động:** Mọi thao tác thêm/sửa/xóa bàn từ trang Admin sẽ ngay lập tức được đồng bộ và phản ánh sang trang đặt bàn của Khách hàng.
+```text
+frontend/src/
+├── models/                     # [M] MODEL: Quản lý thực thể, gọi API & bộ nhớ đệm Offline
+│   ├── UserModel.js            # Xác thực người dùng, lưu trữ JWT token
+│   ├── TableModel.js           # Xử lý dữ liệu bàn & đồng bộ trạng thái
+│   ├── MenuModel.js            # Thực đơn thức uống, phân loại danh mục
+│   └── ReservationModel.js     # Tạo lượt đặt bàn, cập nhật trạng thái phê duyệt
+│
+├── presenters/                 # [P] PRESENTER: Xử lý logic hiển thị, tính toán & định dạng
+│   ├── AuthPresenter.js        # Logic kiểm tra form đăng nhập / đăng ký / quick login
+│   ├── BookingPresenter.js     # Tính tổng tiền đặt trước, quản lý quy trình đặt bàn
+│   ├── TablesPresenter.js      # Lọc khu vực bàn, tính toán số lượng bàn trống
+│   ├── MenuPresenter.js        # Tìm kiếm món, lọc danh mục, tăng/giảm giỏ hàng
+│   ├── MyBookingsPresenter.js  # Lọc lịch sử đặt bàn, xử lý hủy bàn
+│   └── AdminDashboardPresenter.js # Thống kê doanh thu, tỷ lệ lấp đầy, duyệt nhanh
+│
+├── views/                      # [V] VIEW: Thành phần giao diện thuần túy (Passive View)
+│   ├── auth/
+│   │   ├── LoginView.js        # Giao diện Đăng nhập & nút chuyển quyền Demo
+│   │   └── RegisterView.js     # Giao diện Đăng ký tài khoản
+│   ├── customer/
+│   │   ├── HomeView.js         # Trang chủ: Giới thiệu quán, món hot, tiện ích
+│   │   ├── BookingView.js      # Form đặt bàn: Ngày giờ, sơ đồ bàn, đặt trước món
+│   │   ├── TablesView.js       # Sơ đồ bàn trực quan theo khu vực & tiện ích
+│   │   ├── MenuView.js         # Thực đơn nước uống, tìm kiếm & giỏ hàng
+│   │   ├── MyBookingsView.js   # Lịch sử đặt bàn của khách & trạng thái
+│   │   └── ProfileView.js      # Thông tin cá nhân, hotline & chuyển sang Quản trị
+│   └── admin/
+│       ├── AdminDashboardView.js # Thống kê tổng quan, duyệt đặt bàn chờ
+│       ├── AdminBookingsView.js  # Quản lý tất cả lượt đặt bàn (Duyệt / Hủy)
+│       ├── AdminTablesView.js    # Thêm bàn, đổi trạng thái (Trống / Đang dùng / Đã đặt)
+│       ├── AdminMenuView.js      # Thêm món mới, bật/tắt còn hàng, xóa món
+│       └── AdminUsersView.js     # Quản lý tài khoản (Khóa / Mở khóa, thêm nhân viên)
+│
+├── context/                    # Context chia sẻ trạng thái & liên kết Presenter
+├── navigation/                 # AppNavigator (Bottom Tabs + Native Stack)
+├── theme/                      # Bảng màu chủ đạo Amber / Cream / Stone
+└── config/                     # Cấu hình IP/API đa nền tảng (Android / iOS / Web)
+```
 
 ---
 
-## 🛠️ Công nghệ sử dụng
+## 🛠️ Công Nghệ Sử Dụng
 
-* **Frontend:**
-  * HTML5 
-  * CSS3 
-  * TailwindCSS 
-  * JavaScript ES6+ (Xử lý logic động, tương tác APIs, LocalStorage fallback)
+* **Frontend (Mobile App - Kiến trúc MVP):**
+  * React Native (Expo SDK 58)
+  * React Navigation (Bottom Tabs, Native Stack)
+  * @react-native-async-storage/async-storage
+  * @expo/vector-icons (Ionicons)
+  * Hỗ trợ đa nền tảng: Android, iOS và Web
 * **Backend:**
-  * Java Spring Boot 3
-  * Spring Security & JWT (Bảo mật xác thực phân quyền Admin / Customer)
-  * Spring Data MongoDB
-* **Database:**
-  * MongoDB 
+  * Python 3
+  * **FastAPI** (RESTful API tốc độ cao, hỗ trợ Swagger UI tài liệu tự động `/docs`)
+  * Uvicorn (ASGI server)
+  * Pydantic v2 (Validation dữ liệu)
+  * Database lưu trữ JSON tự động đồng bộ & nạp dữ liệu mẫu
 
 ---
 
-## 🚀 Hướng dẫn cài đặt & Khởi chạy
+## 🚀 Hướng Dẫn Khởi Chạy
 
-### Yêu cầu hệ thống
-* Đã cài đặt **Java JDK 17** hoặc mới hơn.
-* Đã cài đặt **Node.js** và **npm**.
-* Đã bật dịch vụ **MongoDB** local (cổng mặc định `27017`).
-
-### 1. Khởi chạy Backend (Spring Boot)
-1. Di chuyển vào thư mục backend:
+### 1. Khởi chạy Backend (FastAPI)
+1. Di chuyển vào thư mục `backend`:
    ```bash
    cd backend
    ```
-2. Biên dịch dự án:
+2. Cài đặt các thư viện cần thiết:
    ```bash
-   ./mvnw compile
+   pip install -r requirements.txt
    ```
-3. Chạy ứng dụng:
+3. Chạy FastAPI server:
    ```bash
-   ./mvnw spring-boot:run
+   python main.py
+   # hoặc: uvicorn main:app --reload --host 0.0.0.0 --port 8080
    ```
+*Server sẽ chạy tại `http://localhost:8080` (Tài liệu Swagger API tại `http://localhost:8080/docs`).*
 
-
-### 2. Khởi chạy Giao diện (Frontend)
-1. Di chuyển vào thư mục frontend:
+### 2. Khởi chạy Ứng dụng Di động (Frontend React Native)
+1. Mở terminal mới và di chuyển vào thư mục `frontend`:
    ```bash
-   cd ../frontend
+   cd frontend
    ```
-2. Cài đặt các dependencies cần thiết (nếu có):
+2. Cài đặt thư viện:
    ```bash
    npm install
    ```
-3. Chạy server phát triển cục bộ:
+3. Khởi chạy ứng dụng:
    ```bash
-   npm run dev
+   npm start
    ```
-*Mở trình duyệt truy cập đường dẫn hiển thị trên terminal (thường là `http://localhost:5173`).*
+   * **Chạy trên điện thoại di động:** Quét mã QR trên Terminal bằng ứng dụng **Expo Go** (Android/iOS).
+   * **Chạy trên Android Emulator:** Nhấn phím `a` trên Terminal.
+   * **Chạy thử trên Web Browser:** Nhấn phím `w` trên Terminal hoặc chạy lệnh `npm run web`.
 
 ---
 
-## 🔐 Tài khoản thử nghiệm 
+## 🔐 Tài Khoản Kiểm Thử (Đăng nhập nhanh 1-chạm)
 
-Hệ thống đã được seeder sẵn tài khoản mẫu để bạn kiểm tra các chức năng phân quyền:
+Tại màn hình Đăng nhập của ứng dụng, đã tích hợp sẵn 3 nút chuyển quyền tức thì:
 
-* **Tài khoản Admin (Quản trị viên):**
-  * Email: `admin@pamcoffeetea.com`
-  * Mật khẩu: `admin`
-* **Tài khoản Customer (Khách hàng):**
-  * Email: `khachhang@gmail.com`
-  * Mật khẩu: `customer`
-
----
-
-## 📁 Cấu trúc thư mục dự án
-
-```text
-├── backend/                   # Mã nguồn Spring Boot Backend
-│   ├── src/main/java/         # Mã nguồn Java (Controllers, Services, Models, Repositories)
-│   └── src/main/resources/    # Cấu hình dự án (application.yml)
-├── frontend/                  # Mã nguồn giao diện tĩnh và assets
-│   ├── assets/                # Hình ảnh, logo, tài nguyên tĩnh
-│   ├── js/                    # Các file xử lý logic Javascript (main.js, booking.js, admin.js)
-│   ├── index.html             # Trang chủ khách hàng
-│   ├── booking.html           # Trang đặt bàn
-│   ├── tables.html            # Trang sơ đồ bàn
-│   ├── menu.html              # Trang thực đơn
-│   ├── login.html             # Trang đăng nhập
-│   └── register.html          # Trang đăng ký
-└── README.md                  # Hướng dẫn dự án
-```
+* **👑 Admin (Quản trị viên):** `admin@pamcoffeetea.com` / `admin`
+* **💼 Staff (Nhân viên quán):** `nhanvien@pamcoffeetea.com` / `staff`
+* **☕ Customer (Khách hàng):** `khachhang@gmail.com` / `customer`
