@@ -48,3 +48,4 @@ export class MyBookingsPresenter {
 }
 
 export default MyBookingsPresenter;
+

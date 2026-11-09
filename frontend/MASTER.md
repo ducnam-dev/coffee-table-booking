@@ -58,3 +58,4 @@
 - All interactive buttons & touchables must have `minHeight: 44px` and `minWidth: 44px`.
 - Every text node handling dynamic strings uses `numberOfLines` and `ellipsizeMode="tail"`.
 - Responsive layout handles Orientation change smoothly via `useResponsive()`.
+

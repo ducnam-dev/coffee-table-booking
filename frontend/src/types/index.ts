@@ -86,3 +86,4 @@ export interface AICoffeeRecommendation {
   moodAnalysis: string;
   baristaTip: string;
 }
+

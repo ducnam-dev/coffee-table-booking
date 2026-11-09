@@ -41,3 +41,4 @@ export const tablesSlice = createSlice({
 
 export const { setTables, selectTable, updateTableStatusInStore, setLoading } = tablesSlice.actions;
 export default tablesSlice.reducer;
+

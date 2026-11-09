@@ -193,6 +193,34 @@
   ],
   "reservations": [
     {
+      "id": 1794237095587,
+      "customerName": "Nguyễn Văn Khách",
+      "customerPhone": "",
+      "customerEmail": "",
+      "userId": 2,
+      "coffeeTable": {},
+      "reservationTime": "09:00",
+      "timeDisplay": "Hôm nay",
+      "guestNumber": 2,
+      "note": "",
+      "status": "PENDING",
+      "orderItems": []
+    },
+    {
+      "id": 1794237093680,
+      "customerName": "Nguyễn Văn Khách",
+      "customerPhone": "",
+      "customerEmail": "",
+      "userId": 2,
+      "coffeeTable": {},
+      "reservationTime": "09:00",
+      "timeDisplay": "Hôm nay",
+      "guestNumber": 2,
+      "note": "",
+      "status": "PENDING",
+      "orderItems": []
+    },
+    {
       "id": 1,
       "customerName": "Lê Hoàng Khách VIP",
       "customerPhone": "0901234567",

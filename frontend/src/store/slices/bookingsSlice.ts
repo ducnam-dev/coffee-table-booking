@@ -58,3 +58,4 @@ export const {
 } = bookingsSlice.actions;
 
 export default bookingsSlice.reducer;
+

@@ -46,3 +46,4 @@ export function useResponsive(): ResponsiveInfo {
 }
 
 export default useResponsive;
+

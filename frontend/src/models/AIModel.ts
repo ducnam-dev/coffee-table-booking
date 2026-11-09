@@ -56,3 +56,4 @@ export class AIModel {
 }
 
 export default AIModel;
+

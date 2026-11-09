@@ -76,3 +76,4 @@ export class BookingPresenter {
 }
 
 export default BookingPresenter;
+

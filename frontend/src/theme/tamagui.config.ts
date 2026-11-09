@@ -10,3 +10,4 @@ declare module 'tamagui' {
 }
 
 export default tamaguiConfig;
+
