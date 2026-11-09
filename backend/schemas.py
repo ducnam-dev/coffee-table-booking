@@ -26,6 +26,9 @@ class JwtResponse(BaseModel):
 class MessageResponse(BaseModel):
     message: str
 
+class StatusUpdateRequest(BaseModel):
+    status: str
+
 # Coffee Table Schemas
 class CoffeeTableBase(BaseModel):
     name: str

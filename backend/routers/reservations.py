@@ -1,7 +1,7 @@
 import time
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Query, Depends
-from schemas import Reservation, ReservationCreate
+from schemas import Reservation, ReservationCreate, StatusUpdateRequest
 from database import db
 from middleware import get_current_user, require_role
 
@@ -53,22 +53,31 @@ def create_reservation(res_data: ReservationCreate):
     return new_reservation
 
 @router.put("/{res_id}/status", response_model=Reservation)
-def update_reservation_status(res_id: int, status: str = Query(...), current_user: dict = Depends(require_role("ROLE_MANAGER"))):
+def update_reservation_status(
+    res_id: int,
+    status: Optional[str] = Query(None),
+    body: Optional[StatusUpdateRequest] = None,
+    current_user: dict = Depends(require_role("ROLE_MANAGER"))
+):
+    target_status = (body.status if body and body.status else status)
+    if not target_status:
+        raise HTTPException(status_code=400, detail="Thiếu trạng thái status")
+
     reservations = db.data.get("reservations", [])
     tables = db.data.get("tables", [])
 
     for r in reservations:
         if r["id"] == res_id:
-            r["status"] = status
+            r["status"] = target_status
 
             # If confirmed or cancelled, reflect on table
             table_id = r.get("coffeeTable", {}).get("id")
             if table_id:
                 for t in tables:
                     if t["id"] == table_id:
-                        if status == "CANCELLED":
+                        if target_status == "CANCELLED":
                             t["status"] = "AVAILABLE"
-                        elif status == "CONFIRMED":
+                        elif target_status == "CONFIRMED":
                             t["status"] = "OCCUPIED"
                         break
 

@@ -61,23 +61,26 @@ export const AdminUserTrackingView: React.FC<AdminUserTrackingViewProps> = ({
     iconColor: string
   ) => (
     <View style={styles.statList}>
-      {items.map((item, idx) => (
-        <View key={item.menuItemId} style={styles.statRow}>
-          <View style={styles.statRank}>
-            <Text style={styles.statRankText}>#{idx + 1}</Text>
+      {items.map((item, idx) => {
+        const idKey = item.menuItemId || (item as any).id || idx;
+        return (
+          <View key={`${idKey}-${idx}`} style={styles.statRow}>
+            <View style={styles.statRank}>
+              <Text style={styles.statRankText}>#{idx + 1}</Text>
+            </View>
+            <Ionicons name={icon} size={18} color={iconColor} style={styles.statIcon} />
+            <View style={styles.statInfo}>
+              <Text style={styles.statName} numberOfLines={1}>
+                {item.name}
+              </Text>
+            </View>
+            <Badge
+              label={`${item.count}`}
+              variant={idx === 0 ? 'amber' : 'neutral'}
+            />
           </View>
-          <Ionicons name={icon} size={18} color={iconColor} style={styles.statIcon} />
-          <View style={styles.statInfo}>
-            <Text style={styles.statName} numberOfLines={1}>
-              {item.name}
-            </Text>
-          </View>
-          <Badge
-            label={`${item.count}`}
-            variant={idx === 0 ? 'amber' : 'neutral'}
-          />
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 
