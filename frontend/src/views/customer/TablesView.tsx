@@ -8,7 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { useResponsive } from '../../theme/responsive';
 import { AnimatedScaleButton } from '../../components/AnimatedScaleButton';
@@ -35,6 +35,7 @@ const AREAS: { key: TableArea | 'ALL'; label: string }[] = [
 export const TablesView: React.FC<TablesViewProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const responsive = useResponsive();
+  const insets = useSafeAreaInsets();
   const tables = useAppSelector((state) => state.tables.tables);
   const selected = useAppSelector((state) => state.tables.selectedTable);
 
@@ -88,7 +89,7 @@ export const TablesView: React.FC<TablesViewProps> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + spacing.xs }]}>
       {/* Navigation Header Bar with Back Button */}
       <View style={[styles.navHeader, { paddingHorizontal: responsive.horizontalPadding }]}>
         <AnimatedScaleButton
@@ -249,7 +250,7 @@ export const TablesView: React.FC<TablesViewProps> = ({ navigation }) => {
           </View>
         </ScrollView>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

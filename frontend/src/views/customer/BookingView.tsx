@@ -9,6 +9,7 @@ import {
   Alert,
   Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { AnimatedScaleButton } from '../../components/AnimatedScaleButton';
@@ -95,9 +96,20 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
 
   const availableTables = tables.filter((t) => t.status === 'AVAILABLE');
 
+  const insets = useSafeAreaInsets();
+
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scroll,
+          {
+            paddingTop: Math.max(insets.top, 16) + spacing.xs,
+            paddingBottom: 170,
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <FadeInView style={styles.header}>
           <Text style={styles.headerTitle}>Đặt Bàn Thưởng Thức</Text>
@@ -237,7 +249,9 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
                     </Text>
                   </View>
                   <Text style={styles.tableChoiceCap}>{t.capacity || (t as any).seats || 4} chỗ</Text>
-                  <Text style={styles.tableChoiceArea}>{t.name || t.area}</Text>
+                  <Text style={styles.tableChoiceArea} numberOfLines={1} ellipsizeMode="tail">
+                    {t.name || t.area}
+                  </Text>
                 </AnimatedScaleButton>
               );
             })}
@@ -247,7 +261,7 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
         {/* 4. Pre-ordered Drinks */}
         <FadeInView delay={240} style={styles.sectionWrap}>
           <View style={styles.rowBetween}>
-            <Text style={styles.sectionHeading}>4. Món Đã Đặt Trước ({cart.length})</Text>
+            <Text style={styles.sectionHeading}>4. Món Đặt Trước ({cart.length})</Text>
             <AnimatedScaleButton onPress={() => navigation.navigate('Menu')}>
               <Text style={styles.viewMapText}>+ Thêm món</Text>
             </AnimatedScaleButton>
@@ -317,7 +331,7 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryTotalLabel}>Tổng Tiền Cọc Cần Thanh Toán:</Text>
+              <Text style={styles.summaryTotalLabel}>Tổng cọc cần thanh toán:</Text>
               <Text style={styles.summaryTotalVal}>{depositAmount.toLocaleString('vi-VN')} đ</Text>
             </View>
             <Text style={styles.summaryNote}>
@@ -485,15 +499,16 @@ const styles = StyleSheet.create({
     paddingRight: spacing.xl,
   },
   tableChoiceCard: {
-    width: 90,
-    height: 100,
+    width: 104,
+    minHeight: 106,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: spacing.xs,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xs,
   },
   tableChoiceCardActive: {
     backgroundColor: colors.primarySubtle,
@@ -501,9 +516,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   tableNumberBox: {
-    width: 34,
-    height: 34,
-    borderRadius: radius.md,
+    paddingHorizontal: 8,
+    height: 28,
+    minWidth: 44,
+    borderRadius: radius.sm,
     backgroundColor: colors.surfaceSubtle,
     alignItems: 'center',
     justifyContent: 'center',
@@ -513,7 +529,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   tableNumberBoxText: {
-    ...typography.bodyLarge,
+    fontSize: 14,
     fontWeight: '800',
     color: colors.textPrimary,
   },
@@ -583,7 +599,10 @@ const styles = StyleSheet.create({
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 3,
+    alignItems: 'center',
+    marginVertical: 4,
+    flexWrap: 'wrap',
+    gap: 4,
   },
   summaryLabel: {
     ...typography.bodySmall,
@@ -599,12 +618,15 @@ const styles = StyleSheet.create({
     marginVertical: spacing.sm,
   },
   summaryTotalLabel: {
-    ...typography.bodyLarge,
+    fontSize: 15,
     fontWeight: '700',
     color: colors.espresso,
+    flex: 1,
+    minWidth: 160,
   },
   summaryTotalVal: {
-    ...typography.h2,
+    fontSize: 18,
+    fontWeight: '800',
     color: colors.primaryDark,
   },
   summaryNote: {
@@ -618,15 +640,15 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 85,
+    height: 76,
     backgroundColor: colors.surface,
     borderTopWidth: 1,
     borderTopColor: colors.border,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xs,
     ...shadows.medium,
   },
   bottomDepositLabel: {

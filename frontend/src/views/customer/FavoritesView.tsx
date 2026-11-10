@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { useResponsive } from '../../theme/responsive';
 import { AnimatedScaleButton } from '../../components/AnimatedScaleButton';
@@ -35,6 +35,7 @@ interface FavoritesViewProps {
 export const FavoritesView: React.FC<FavoritesViewProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const responsive = useResponsive();
+  const insets = useSafeAreaInsets();
   const user = useAppSelector((state) => state.auth.user);
   const favorites = useAppSelector((state) => state.tracking.favorites);
   const recommendations = useAppSelector((state) => state.tracking.recommendations);
@@ -88,7 +89,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + spacing.xs }]}>
       {/* Header */}
       <View style={[styles.header, { paddingHorizontal: responsive.horizontalPadding }]}>
         <AnimatedScaleButton onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -101,7 +102,10 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({ navigation }) => {
       <ScrollView
         contentContainerStyle={[
           styles.scroll,
-          { paddingHorizontal: responsive.horizontalPadding },
+          {
+            paddingHorizontal: responsive.horizontalPadding,
+            paddingBottom: Math.max(insets.bottom, 20) + 30,
+          },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -268,7 +272,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({ navigation }) => {
             </FadeInView>
           )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

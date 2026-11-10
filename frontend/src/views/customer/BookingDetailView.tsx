@@ -7,7 +7,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { AnimatedScaleButton } from '../../components/AnimatedScaleButton';
 import { FadeInView } from '../../components/FadeInView';
@@ -22,6 +22,7 @@ interface BookingDetailViewProps {
 
 export const BookingDetailView: React.FC<BookingDetailViewProps> = ({ route, navigation }) => {
   const { booking } = route.params;
+  const insets = useSafeAreaInsets();
 
   const getStatusBadge = (status: ReservationStatus): { label: string; variant: BadgeVariant } => {
     switch (status) {
@@ -39,7 +40,7 @@ export const BookingDetailView: React.FC<BookingDetailViewProps> = ({ route, nav
   const statusBadge = getStatusBadge(booking.status);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + spacing.xs }]}>
       {/* Header */}
       <View style={styles.header}>
         <AnimatedScaleButton onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -49,7 +50,13 @@ export const BookingDetailView: React.FC<BookingDetailViewProps> = ({ route, nav
         <View style={{ width: 44 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingBottom: Math.max(insets.bottom, 20) + 30 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Physical Coffee Ticket Card */}
         <FadeInView style={styles.ticketCard}>
           <View style={styles.ticketHeader}>
@@ -168,7 +175,7 @@ export const BookingDetailView: React.FC<BookingDetailViewProps> = ({ route, nav
           <Text style={styles.contactSecondaryBtnText}>Cần hỗ trợ? Gọi hotline quán 0901 234 567</Text>
         </AnimatedScaleButton>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -346,6 +353,8 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderRadius: radius.md,
     marginTop: spacing.xs,
+    flexWrap: 'wrap',
+    gap: 6,
   },
   depositLabel: {
     ...typography.caption,
