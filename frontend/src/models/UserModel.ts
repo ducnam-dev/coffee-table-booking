@@ -6,22 +6,40 @@ const USER_STORAGE_KEY = 'current_user';
 const TOKEN_STORAGE_KEY = 'user_token';
 
 const DEMO_USERS: Record<string, User> = {
+  manager: {
+    id: 1,
+    username: 'manager',
+    email: 'manager@pamcoffee.vn',
+    fullName: 'Quản Lý Pam Coffee',
+    phone: '0901234567',
+    role: 'ROLE_MANAGER',
+    isActive: true,
+  },
   admin: {
     id: 1,
-    username: 'admin',
-    email: 'admin@pamcoffee.vn',
-    fullName: 'Quản Trị Viên Pam',
+    username: 'manager',
+    email: 'manager@pamcoffee.vn',
+    fullName: 'Quản Lý Pam Coffee',
     phone: '0901234567',
-    role: 'ROLE_ADMIN',
+    role: 'ROLE_MANAGER',
+    isActive: true,
+  },
+  customer: {
+    id: 2,
+    username: 'customer',
+    email: 'customer@pamcoffee.vn',
+    fullName: 'Nguyễn Văn Khách',
+    phone: '0987654321',
+    role: 'ROLE_CUSTOMER',
     isActive: true,
   },
   khachhang: {
     id: 2,
-    username: 'khachhang',
+    username: 'customer',
     email: 'customer@pamcoffee.vn',
     fullName: 'Nguyễn Văn Khách',
     phone: '0987654321',
-    role: 'ROLE_USER',
+    role: 'ROLE_CUSTOMER',
     isActive: true,
   },
 };
@@ -31,13 +49,14 @@ export class UserModel {
     try {
       const response = await axiosClient.post('/auth/login', { username, password });
       const data = response.data;
+      const isManager = data.role === 'ROLE_MANAGER' || data.role === 'ROLE_ADMIN' || data.roles?.[0] === 'ROLE_MANAGER' || data.roles?.[0] === 'ROLE_ADMIN';
       const user: User = {
         id: data.id || 1,
         username: data.username,
         email: data.email,
         fullName: data.fullName || data.username,
         phone: data.phone || '0901234567',
-        role: data.role || (data.roles?.[0] === 'ROLE_ADMIN' ? 'ROLE_ADMIN' : 'ROLE_USER'),
+        role: isManager ? 'ROLE_MANAGER' : 'ROLE_CUSTOMER',
         isActive: true,
       };
       if (data.token) {
@@ -53,7 +72,7 @@ export class UserModel {
         email: `${username}@gmail.com`,
         fullName: username,
         phone: '0900000000',
-        role: 'ROLE_USER',
+        role: username.toLowerCase().includes('manager') || username.toLowerCase().includes('admin') ? 'ROLE_MANAGER' : 'ROLE_CUSTOMER',
         isActive: true,
       };
       await AsyncStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
@@ -73,7 +92,7 @@ export class UserModel {
         email: userData.email,
         fullName: userData.fullName,
         phone: userData.phone || '',
-        role: 'ROLE_USER',
+        role: 'ROLE_CUSTOMER',
         isActive: true,
       };
       await AsyncStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));

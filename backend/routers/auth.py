@@ -18,11 +18,11 @@ def signin(login_data: LoginRequest):
             break
             
     if not matched:
-        # Check quick fallback credentials (admin/staff/customer)
-        if "admin" in email_or_user:
-            matched = {"id": 1, "username": "admin", "email": "admin@pamcoffeetea.com", "fullName": "Quản Trị Pam Coffee", "role": "ROLE_ADMIN", "password": login_data.password}
-        elif "staff" in email_or_user:
-            matched = {"id": 3, "username": "staff", "email": "nhanvien@pamcoffeetea.com", "fullName": "Nhân Viên Pam Coffee", "role": "ROLE_STAFF", "password": login_data.password}
+        # Check quick fallback credentials (manager/customer)
+        if "manager" in email_or_user or "admin" in email_or_user:
+            matched = {"id": 1, "username": "manager", "email": "manager@pamcoffeetea.com", "fullName": "Quản Lý Pam Coffee", "role": "ROLE_MANAGER", "password": login_data.password}
+        elif "customer" in email_or_user or "khachhang" in email_or_user:
+            matched = {"id": 2, "username": "customer", "email": "customer@gmail.com", "fullName": "Nguyễn Khách Hàng", "role": "ROLE_CUSTOMER", "password": login_data.password}
         else:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Sai tài khoản hoặc mật khẩu")
 

@@ -70,11 +70,11 @@ export class AuthPresenter {
     }
   }
 
-  async quickDemoLogin(role: 'admin' | 'customer'): Promise<void> {
-    if (role === 'admin') {
-      await this.handleLogin('admin', 'admin123');
+  async quickDemoLogin(role: 'manager' | 'customer' | 'admin'): Promise<void> {
+    if (role === 'manager' || role === 'admin') {
+      await this.handleLogin('manager', 'manager');
     } else {
-      await this.handleLogin('khachhang', 'user123');
+      await this.handleLogin('customer', 'customer');
     }
   }
 }

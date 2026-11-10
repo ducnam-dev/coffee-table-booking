@@ -64,7 +64,7 @@ export const AdminDashboardView: React.FC<{ navigation: any }> = ({ navigation }
         <View>
           <View style={styles.badgeRow}>
             <Ionicons name="shield-checkmark" size={16} color={colors.primaryDark} />
-            <Text style={styles.roleTitle}>TRUNG TÂM QUẢN TRỊ</Text>
+            <Text style={styles.roleTitle}>TRUNG TÂM QUẢN LÝ (MANAGER)</Text>
           </View>
           <Text style={styles.headerTitle}>Pam Coffee & Tea</Text>
         </View>

@@ -17,20 +17,20 @@ import { User } from '../../types';
 const INITIAL_USERS: User[] = [
   {
     id: 1,
-    username: 'admin',
-    email: 'admin@pamcoffee.vn',
-    fullName: 'Quản Trị Viên Pam',
+    username: 'manager',
+    email: 'manager@pamcoffee.vn',
+    fullName: 'Quản Lý Pam Coffee',
     phone: '0901234567',
-    role: 'ROLE_ADMIN',
+    role: 'ROLE_MANAGER',
     isActive: true,
   },
   {
     id: 2,
-    username: 'khachhang',
+    username: 'customer',
     email: 'customer@pamcoffee.vn',
     fullName: 'Nguyễn Văn Khách',
     phone: '0987654321',
-    role: 'ROLE_USER',
+    role: 'ROLE_CUSTOMER',
     isActive: true,
   },
   {
@@ -39,7 +39,7 @@ const INITIAL_USERS: User[] = [
     email: 'nam@gmail.com',
     fullName: 'Trần Hoàng Nam',
     phone: '0912345678',
-    role: 'ROLE_USER',
+    role: 'ROLE_CUSTOMER',
     isActive: true,
   },
   {
@@ -48,7 +48,7 @@ const INITIAL_USERS: User[] = [
     email: 'huong@gmail.com',
     fullName: 'Lê Thu Hương',
     phone: '0933221100',
-    role: 'ROLE_USER',
+    role: 'ROLE_CUSTOMER',
     isActive: false,
   },
 ];
@@ -98,8 +98,8 @@ export const AdminUsersView: React.FC<{ navigation: any }> = ({ navigation }) =>
                 </View>
 
                 <Badge
-                  label={u.role === 'ROLE_ADMIN' ? 'ADMIN' : 'KHÁCH'}
-                  variant={u.role === 'ROLE_ADMIN' ? 'espresso' : 'amber'}
+                  label={u.role === 'ROLE_MANAGER' || u.role === 'ROLE_ADMIN' ? 'MANAGER' : 'CUSTOMER'}
+                  variant={u.role === 'ROLE_MANAGER' || u.role === 'ROLE_ADMIN' ? 'espresso' : 'amber'}
                 />
               </View>
 
@@ -109,7 +109,7 @@ export const AdminUsersView: React.FC<{ navigation: any }> = ({ navigation }) =>
                   variant={u.isActive ? 'success' : 'danger'}
                 />
 
-                {u.role !== 'ROLE_ADMIN' && (
+                {u.role !== 'ROLE_MANAGER' && u.role !== 'ROLE_ADMIN' && (
                   <AnimatedScaleButton
                     onPress={() => toggleUserStatus(u.id)}
                     style={[

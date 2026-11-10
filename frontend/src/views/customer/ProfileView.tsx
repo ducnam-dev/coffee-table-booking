@@ -41,20 +41,21 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ navigation }) => {
     ]);
   };
 
-  const handleSwitchToAdmin = () => {
-    if (user?.role === 'ROLE_ADMIN') {
+  const handleSwitchToManager = () => {
+    const isManager = user?.role === 'ROLE_MANAGER' || user?.role === 'ROLE_ADMIN';
+    if (isManager) {
       navigation.navigate('AdminDashboard');
     } else {
       Alert.alert(
         'Quyền Truy Cập',
-        'Tài khoản này là Khách Hàng. Bạn có muốn chuyển sang giao diện Quản Trị Viên (Admin Demo) không?',
+        'Tài khoản hiện tại là Khách Hàng (Customer). Bạn có muốn chuyển sang giao diện Quản Lý (Manager Demo) không?',
         [
           { text: 'Hủy', style: 'cancel' },
           {
-            text: 'Chuyển Sang Admin',
+            text: 'Chuyển Sang Quản Lý',
             onPress: async () => {
-              const adminUser = await UserModel.login('admin', 'admin123');
-              dispatch({ type: 'auth/setUser', payload: adminUser });
+              const managerUser = await UserModel.login('manager', 'manager');
+              dispatch({ type: 'auth/setUser', payload: managerUser });
               navigation.reset({ index: 0, routes: [{ name: 'AdminDashboard' }] });
             },
           },
@@ -85,7 +86,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ navigation }) => {
               <Text style={styles.fullName}>{user?.fullName || 'Khách Hàng'}</Text>
               <Text style={styles.username}>@{user?.username || 'khachhang'}</Text>
               <Badge
-                label={user?.role === 'ROLE_ADMIN' ? 'QUẢN TRỊ VIÊN' : 'THÀNH VIÊN VÀNG'}
+                label={user?.role === 'ROLE_MANAGER' || user?.role === 'ROLE_ADMIN' ? 'QUẢN LÝ (MANAGER)' : 'KHÁCH HÀNG (CUSTOMER)'}
                 variant="amber"
                 style={styles.roleBadge}
               />
@@ -163,12 +164,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ navigation }) => {
 
           <View style={styles.divider} />
 
-          {/* Switch to Admin Mode */}
-          <AnimatedScaleButton onPress={handleSwitchToAdmin} style={styles.menuItem}>
+          {/* Switch to Manager Mode */}
+          <AnimatedScaleButton onPress={handleSwitchToManager} style={styles.menuItem}>
             <View style={styles.menuItemLeft}>
               <Ionicons name="shield-checkmark-outline" size={20} color={colors.espresso} />
               <Text style={[styles.menuItemText, { fontWeight: '700' }]}>
-                {user?.role === 'ROLE_ADMIN' ? 'Mở Dashboard Quản Trị' : 'Chuyển Quyền Quản Trị (Admin)'}
+                {user?.role === 'ROLE_MANAGER' || user?.role === 'ROLE_ADMIN' ? 'Mở Dashboard Quản Lý' : 'Chuyển Quyền Quản Lý (Manager)'}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />

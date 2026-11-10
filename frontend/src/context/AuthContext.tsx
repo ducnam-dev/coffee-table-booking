@@ -8,7 +8,7 @@ interface AuthContextType {
   login: (u: string, p: string) => Promise<User>;
   register: (data: any) => Promise<User>;
   logout: () => Promise<void>;
-  switchUser: (role: 'admin' | 'customer') => Promise<User>;
+  switchUser: (role: 'manager' | 'customer' | 'admin') => Promise<User>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,11 +41,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCurrentUser(null);
   };
 
-  const switchUser = async (role: 'admin' | 'customer') => {
+  const switchUser = async (role: 'manager' | 'customer' | 'admin') => {
     const user =
-      role === 'admin'
-        ? await UserModel.login('admin', 'admin123')
-        : await UserModel.login('khachhang', 'user123');
+      role === 'manager' || role === 'admin'
+        ? await UserModel.login('manager', 'manager')
+        : await UserModel.login('customer', 'customer');
     setCurrentUser(user);
     return user;
   };

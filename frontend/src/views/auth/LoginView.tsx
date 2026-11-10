@@ -25,8 +25,8 @@ interface LoginViewProps {
 
 export const LoginView: React.FC<LoginViewProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
-  const [username, setUsername] = useState('khachhang');
-  const [password, setPassword] = useState('user123');
+  const [username, setUsername] = useState('customer');
+  const [password, setPassword] = useState('customer');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -35,7 +35,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ navigation }) => {
     showError: (msg) => Alert.alert('Thông báo', msg),
     onLoginSuccess: (user: User) => {
       dispatch(setUser(user));
-      if (user.role === 'ROLE_ADMIN') {
+      if (user.role === 'ROLE_MANAGER' || user.role === 'ROLE_ADMIN') {
         navigation.reset({ index: 0, routes: [{ name: 'AdminDashboard' }] });
       } else {
         navigation.reset({ index: 0, routes: [{ name: 'CustomerTabs' }] });
@@ -75,7 +75,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ navigation }) => {
               style={styles.textInput}
               value={username}
               onChangeText={setUsername}
-              placeholder="Nhập username (vd: khachhang, admin)"
+              placeholder="Nhập username (vd: customer, manager)"
               placeholderTextColor={colors.textMuted}
               autoCapitalize="none"
             />
@@ -132,11 +132,11 @@ export const LoginView: React.FC<LoginViewProps> = ({ navigation }) => {
             </AnimatedScaleButton>
 
             <AnimatedScaleButton
-              onPress={() => presenter.quickDemoLogin('admin')}
+              onPress={() => presenter.quickDemoLogin('manager')}
               style={[styles.quickBtn, styles.quickAdminBtn]}
             >
               <Ionicons name="shield-checkmark" size={16} color={colors.textInverse} />
-              <Text style={styles.quickBtnAdminText}>Quản Trị Demo</Text>
+              <Text style={styles.quickBtnAdminText}>Quản Lý Demo</Text>
             </AnimatedScaleButton>
           </View>
         </FadeInView>

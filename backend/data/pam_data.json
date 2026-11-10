@@ -2,32 +2,22 @@
   "users": [
     {
       "id": 1,
-      "username": "admin",
-      "email": "admin@pamcoffeetea.com",
-      "password": "admin",
-      "fullName": "Quản Trị Pam Coffee",
+      "username": "manager",
+      "email": "manager@pamcoffeetea.com",
+      "password": "manager",
+      "fullName": "Quản Lý Pam Coffee",
       "phone": "0901234567",
-      "role": "ROLE_ADMIN",
+      "role": "ROLE_MANAGER",
       "locked": false
     },
     {
       "id": 2,
       "username": "customer",
-      "email": "khachhang@gmail.com",
+      "email": "customer@gmail.com",
       "password": "customer",
       "fullName": "Nguyễn Khách Hàng",
       "phone": "0988776655",
       "role": "ROLE_CUSTOMER",
-      "locked": false
-    },
-    {
-      "id": 3,
-      "username": "staff",
-      "email": "nhanvien@pamcoffeetea.com",
-      "password": "staff",
-      "fullName": "Nhân Viên Pam Coffee",
-      "phone": "0911223344",
-      "role": "ROLE_STAFF",
       "locked": false
     }
   ],

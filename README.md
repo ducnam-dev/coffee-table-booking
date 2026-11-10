@@ -179,11 +179,11 @@ eas build -p android --profile preview
 
 ## 👥 Tài Khoản Dùng Thử (Demo Credentials)
 
-Tại màn hình Đăng nhập có 2 nút tiện ích **"Khách Demo"** và **"Quản Trị Demo"** để đăng nhập 1 chạm ngay lập tức, hoặc đăng nhập thủ công:
+Hệ thống phân quyền chuẩn gồm 2 vai trò: **Khách hàng (Customer)** và **Quản lý (Manager)** (không dùng Staff). Tại màn hình Đăng nhập có 2 nút tiện ích **"Khách Demo"** và **"Quản Lý Demo"** để đăng nhập 1 chạm, hoặc đăng nhập thủ công:
 
-1. **Tài khoản Quản trị viên (Admin):**
-   - Tên đăng nhập: `admin`
-   - Mật khẩu: `admin123`
+1. **Tài khoản Quản lý (Manager):**
+   - Tên đăng nhập: `manager` *(hoặc alias `admin`)*
+   - Mật khẩu: `manager` *(hoặc `admin`)*
 2. **Tài khoản Khách hàng (Customer):**
-   - Tên đăng nhập: `khachhang`
-   - Mật khẩu: `user123`
+   - Tên đăng nhập: `customer` *(hoặc alias `khachhang`)*
+   - Mật khẩu: `customer` *(hoặc `user123`)*
