@@ -19,6 +19,10 @@ export class MyBookingsPresenter {
     this.view = view;
   }
 
+  setBookings(bookings: Reservation[]): void {
+    this.bookings = bookings;
+  }
+
   getBookings(): Reservation[] {
     return this.bookings;
   }
@@ -38,17 +42,22 @@ export class MyBookingsPresenter {
     }
   }
 
-  async cancelBooking(reservationId: number): Promise<void> {
+  async cancelBooking(reservationId: number, currentList?: Reservation[]): Promise<boolean> {
     try {
       this.view.showLoading(true);
       await ReservationModel.updateStatus(reservationId, 'CANCELLED');
-      const item = this.bookings.find((b) => b.id === reservationId);
-      if (item) item.status = 'CANCELLED';
-      this.view.renderBookings([...this.bookings]);
+      const base = currentList && currentList.length > 0 ? currentList : this.bookings;
+      this.bookings = base.map((b) =>
+        b.id === reservationId ? { ...b, status: 'CANCELLED' as ReservationStatus } : b
+      );
+      this.view.renderBookings(this.bookings);
       this.view.showLoading(false);
-    } catch {
+      return true;
+    } catch (error) {
+      console.error('[cancelBooking] Error:', error);
       this.view.showLoading(false);
       this.view.showError('Hủy đặt bàn thất bại.');
+      return false;
     }
   }
 

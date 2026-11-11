@@ -76,7 +76,8 @@ export class UserModel {
         isActive: true,
       };
       await AsyncStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
-      await AsyncStorage.setItem(TOKEN_STORAGE_KEY, 'mock-jwt-token-pam-coffee');
+      const fallbackToken = `jwt-token-${user.id || 2}-${Date.now()}`;
+      await AsyncStorage.setItem(TOKEN_STORAGE_KEY, fallbackToken);
       return user;
     }
   }

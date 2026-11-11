@@ -118,8 +118,18 @@ def update_reservation_status(
             if authorization:
                 try:
                     user = get_current_user(authorization)
-                    if user.get("role") != "ROLE_MANAGER" and r.get("userId") != user.get("id"):
-                        raise HTTPException(status_code=403, detail="Không có quyền cập nhật đơn đặt bàn này")
+                    if user.get("role") != "ROLE_MANAGER":
+                        res_user_id = r.get("userId")
+                        # If reservation has a userId and it doesn't match current user, check phone/email
+                        if res_user_id is not None and res_user_id != user.get("id"):
+                            user_phone = user.get("phone", "")
+                            res_phone = r.get("phone") or r.get("customerPhone") or ""
+                            user_email = user.get("email", "").lower()
+                            res_email = (r.get("email") or r.get("customerEmail") or "").lower()
+                            phone_matches = user_phone and res_phone and user_phone == res_phone
+                            email_matches = user_email and res_email and user_email == res_email
+                            if not (phone_matches or email_matches):
+                                raise HTTPException(status_code=403, detail="Không có quyền cập nhật đơn đặt bàn này")
                 except HTTPException:
                     raise
                 except Exception:

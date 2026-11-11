@@ -118,10 +118,17 @@ export class ReservationModel {
   static async updateStatus(reservationId: number, status: ReservationStatus): Promise<Reservation> {
     try {
       const res = await axiosClient.put(`/reservations/${reservationId}/status`, { status });
-      return normalizeReservation(res.data);
-    } catch {
+      const updated = normalizeReservation(res.data);
+      MOCK_RESERVATIONS = MOCK_RESERVATIONS.map((r) =>
+        r.id === reservationId ? { ...r, status } : r
+      );
+      return updated;
+    } catch (error) {
+      console.warn('[ReservationModel.updateStatus] fallback to local:', error);
+      MOCK_RESERVATIONS = MOCK_RESERVATIONS.map((r) =>
+        r.id === reservationId ? { ...r, status } : r
+      );
       const found = MOCK_RESERVATIONS.find((r) => r.id === reservationId);
-      if (found) found.status = status;
       return found || ({ id: reservationId, status } as Reservation);
     }
   }
