@@ -52,12 +52,6 @@ interface BookingViewProps {
   navigation: any;
 }
 
-const TIME_SLOTS = [
-  '07:30', '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-  '12:00', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
-  '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00',
-];
-
 export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
@@ -112,6 +106,21 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
     }
   };
   const [reservationTime, setReservationTime] = useState('');
+  const [timeError, setTimeError] = useState('');
+
+  const handleTimeChange = (text: string) => {
+    setReservationTime(text);
+    if (text.length >= 4) {
+      const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+      if (!timeRegex.test(text.trim())) {
+        setTimeError('Định dạng giờ không hợp lệ (ví dụ: 08:30 hoặc 14:00)');
+      } else {
+        setTimeError('');
+      }
+    } else {
+      setTimeError('');
+    }
+  };
   const [selectedTable, setSelectedTable] = useState<CoffeeTable | null>(
     route?.params?.preselectedTable || null
   );
@@ -281,60 +290,21 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
               )}
             </View>
 
-            <View style={styles.timeHeaderRow}>
-              <Text style={styles.label}>Khung giờ đến: *</Text>
-              {reservationTime ? (
-                <View style={styles.selectedTimeBadge}>
-                  <Ionicons name="time" size={13} color={colors.primaryDark} />
-                  <Text style={styles.selectedTimeBadgeText}>{reservationTime}</Text>
-                </View>
-              ) : (
-                <Text style={styles.unselectedTimeHint}>(Chạm để chọn giờ)</Text>
-              )}
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-              nestedScrollEnabled
-              {...(Platform.OS === 'web'
-                ? {
-                    onWheel: (e: any) => {
-                      if (e.deltaY !== 0 && Math.abs(e.deltaX) < Math.abs(e.deltaY)) {
-                        e.currentTarget.scrollLeft += e.deltaY;
-                      }
-                    },
-                  }
-                : {})}
-              contentContainerStyle={styles.timeScroll}
-            >
-              {TIME_SLOTS.map((time) => {
-                const isSelected = reservationTime === time;
-                return (
-                  <AnimatedScaleButton
-                    key={time}
-                    onPress={() => setReservationTime(time)}
-                    style={[styles.timeChip, isSelected && styles.timeChipActive]}
-                  >
-                    <Text style={[styles.timeChipText, isSelected && styles.timeChipTextActive]}>
-                      {time}
-                    </Text>
-                  </AnimatedScaleButton>
-                );
-              })}
-            </ScrollView>
-
-            <View style={styles.customTimeBox}>
-              <Text style={styles.customTimeLabel}>Hoặc tự nhập giờ bạn muốn đến:</Text>
-              <TextInput
-                style={styles.customTimeInput}
-                value={reservationTime}
-                onChangeText={(text) => setReservationTime(text.trim())}
-                placeholder="Ví dụ: 08:45 hoặc 14:15"
-                placeholderTextColor={colors.textMuted}
-                maxLength={5}
-              />
-            </View>
+            <Text style={[styles.label, { marginTop: spacing.md }]}>Khung giờ đến: *</Text>
+            <TextInput
+              style={[styles.input, timeError ? styles.inputError : null]}
+              value={reservationTime}
+              onChangeText={handleTimeChange}
+              placeholder="Nhập giờ đến (ví dụ: 08:30, 09:00, 14:15)"
+              placeholderTextColor={colors.textMuted}
+              keyboardType="numbers-and-punctuation"
+              maxLength={5}
+            />
+            {timeError ? (
+              <Text style={styles.errorText}>{timeError}</Text>
+            ) : (
+              <Text style={styles.phoneHint}>Định dạng giờ:phút (ví dụ: 08:30 hoặc 14:00)</Text>
+            )}
           </BentoCard>
         </FadeInView>
 
@@ -686,40 +656,6 @@ const styles = StyleSheet.create({
   customDateRow: {
     marginTop: spacing.sm,
   },
-  timeHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: spacing.md,
-    marginBottom: spacing.xs,
-  },
-  selectedTimeBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: colors.primarySubtle,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  selectedTimeBadgeText: {
-    ...typography.caption,
-    fontWeight: '800',
-    color: colors.primaryDark,
-  },
-  unselectedTimeHint: {
-    ...typography.caption,
-    color: colors.textMuted,
-    fontStyle: 'italic',
-  },
-  customTimeBox: {
-    marginTop: spacing.sm,
-    paddingTop: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
   customTimeLabel: {
     ...typography.caption,
     color: colors.textSecondary,
@@ -736,34 +672,6 @@ const styles = StyleSheet.create({
     ...typography.body,
     fontSize: 14,
     color: colors.textPrimary,
-  },
-  timeScroll: {
-    gap: spacing.sm,
-    paddingVertical: spacing.xs,
-    paddingRight: spacing.xl,
-  },
-  timeChip: {
-    paddingHorizontal: spacing.md,
-    height: 38,
-    borderRadius: radius.md,
-    backgroundColor: colors.surfaceSubtle,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  timeChipActive: {
-    backgroundColor: colors.espresso,
-    borderColor: colors.espresso,
-  },
-  timeChipText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  timeChipTextActive: {
-    color: colors.textInverse,
-    fontWeight: '700',
   },
   tableScroll: {
     gap: spacing.sm,
