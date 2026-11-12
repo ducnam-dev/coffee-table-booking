@@ -7,6 +7,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { AnimatedScaleButton } from '../../components/AnimatedScaleButton';
 import { FadeInView } from '../../components/FadeInView';
@@ -38,7 +39,7 @@ export const BookingDetailView: React.FC<BookingDetailViewProps> = ({ route, nav
   const statusBadge = getStatusBadge(booking.status);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
         <AnimatedScaleButton onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -151,14 +152,14 @@ export const BookingDetailView: React.FC<BookingDetailViewProps> = ({ route, nav
           </AnimatedScaleButton>
 
           <AnimatedScaleButton
-            onPress={() => navigation.navigate('Home')}
+            onPress={() => navigation.navigate('CustomerTabs', { screen: 'Home' })}
             style={styles.homeBtn}
           >
             <Text style={styles.homeBtnText}>Về Trang Chủ</Text>
           </AnimatedScaleButton>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -172,7 +173,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
+    paddingTop: spacing.sm,
     paddingBottom: spacing.sm,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,

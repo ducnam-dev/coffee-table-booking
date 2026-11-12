@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { useResponsive } from '../../theme/responsive';
 import { AnimatedScaleButton } from '../../components/AnimatedScaleButton';
@@ -71,11 +72,39 @@ export const TablesView: React.FC<TablesViewProps> = ({ navigation }) => {
   const handleSelectTable = (table: CoffeeTable) => {
     if (table.status !== 'AVAILABLE') return;
     dispatch(selectTable(table));
-    navigation.navigate('Booking', { preselectedTable: table });
+    navigation.navigate('CustomerTabs', {
+      screen: 'Booking',
+      params: { preselectedTable: table },
+    });
+  };
+
+  const handleGoBack = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('CustomerTabs');
+    }
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Navigation Header Bar with Back Button */}
+      <View style={[styles.navHeader, { paddingHorizontal: responsive.horizontalPadding }]}>
+        <AnimatedScaleButton
+          onPress={handleGoBack}
+          style={styles.backBtn}
+        >
+          <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
+        </AnimatedScaleButton>
+        <Text style={styles.navTitle} numberOfLines={1}>Sơ Đồ Bàn Quán</Text>
+        <AnimatedScaleButton
+          onPress={() => presenter.loadTables()}
+          style={styles.backBtn}
+        >
+          <Ionicons name="refresh" size={20} color={colors.textPrimary} />
+        </AnimatedScaleButton>
+      </View>
+
       {/* Area Selector Filter Tabs */}
       <View style={[styles.filterBar, { paddingHorizontal: responsive.horizontalPadding }]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
@@ -193,7 +222,7 @@ export const TablesView: React.FC<TablesViewProps> = ({ navigation }) => {
           </View>
         </ScrollView>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -202,8 +231,31 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  navHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  backBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.surfaceSubtle,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navTitle: {
+    ...typography.h2,
+    color: colors.textPrimary,
+    flex: 1,
+    textAlign: 'center',
+  },
   filterBar: {
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,

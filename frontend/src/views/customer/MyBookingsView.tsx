@@ -8,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { useResponsive } from '../../theme/responsive';
 import { AnimatedScaleButton } from '../../components/AnimatedScaleButton';
@@ -80,11 +81,25 @@ export const MyBookingsView: React.FC<MyBookingsViewProps> = ({ navigation }) =>
     );
   };
 
+  const handleGoBack = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('CustomerTabs');
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header Tabs */}
       <View style={[styles.header, { paddingHorizontal: responsive.horizontalPadding }]}>
-        <Text style={styles.title}>Lịch Sử Đặt Bàn</Text>
+        <View style={styles.navRow}>
+          <AnimatedScaleButton onPress={handleGoBack} style={styles.backBtn}>
+            <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
+          </AnimatedScaleButton>
+          <Text style={styles.title} numberOfLines={1}>Lịch Sử Đặt Bàn</Text>
+          <View style={{ width: 44 }} />
+        </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
           {TABS.map((tab) => {
             const isActive = selectedStatus === tab.key;
@@ -187,7 +202,7 @@ export const MyBookingsView: React.FC<MyBookingsViewProps> = ({ navigation }) =>
               <Text style={styles.emptyTitle}>Chưa có lịch đặt bàn nào</Text>
               <Text style={styles.emptyDesc}>Các lượt đặt bàn của bạn sẽ hiển thị tại đây.</Text>
               <AnimatedScaleButton
-                onPress={() => navigation.navigate('Booking')}
+                onPress={() => navigation.navigate('CustomerTabs', { screen: 'Booking' })}
                 style={styles.reserveNowBtn}
               >
                 <Text style={styles.reserveNowBtnText}>Đặt Bàn Ngay</Text>
@@ -196,7 +211,7 @@ export const MyBookingsView: React.FC<MyBookingsViewProps> = ({ navigation }) =>
           )}
         </ScrollView>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -206,15 +221,31 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    paddingTop: spacing.lg,
+    paddingTop: spacing.sm,
     paddingBottom: spacing.sm,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  title: {
-    ...typography.h1,
+  navRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: spacing.sm,
+  },
+  backBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.surfaceSubtle,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    ...typography.h2,
+    color: colors.textPrimary,
+    flex: 1,
+    textAlign: 'center',
   },
   tabsRow: {
     gap: spacing.sm,

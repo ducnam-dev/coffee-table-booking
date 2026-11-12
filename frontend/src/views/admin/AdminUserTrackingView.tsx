@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { useResponsive } from '../../theme/responsive';
 import { AnimatedScaleButton } from '../../components/AnimatedScaleButton';
@@ -73,7 +74,7 @@ export const AdminUserTrackingView: React.FC<AdminUserTrackingViewProps> = ({
           </View>
           <Badge
             label={`${item.count}`}
-            variant={idx === 0 ? 'amber' : 'default'}
+            variant={idx === 0 ? 'amber' : 'neutral'}
           />
         </View>
       ))}
@@ -81,7 +82,7 @@ export const AdminUserTrackingView: React.FC<AdminUserTrackingViewProps> = ({
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={[styles.header, { paddingHorizontal: responsive.horizontalPadding }]}>
         <AnimatedScaleButton onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -205,7 +206,7 @@ export const AdminUserTrackingView: React.FC<AdminUserTrackingViewProps> = ({
           </FadeInView>
         </ScrollView>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -218,7 +219,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: spacing.lg,
+    paddingTop: spacing.sm,
     paddingBottom: spacing.md,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
