@@ -21,6 +21,7 @@ import { MyBookingsView } from '../views/customer/MyBookingsView';
 import { ProfileView } from '../views/customer/ProfileView';
 import { NotificationsView } from '../views/customer/NotificationsView';
 import { AICoffeeAssistantView } from '../views/customer/AICoffeeAssistantView';
+import { FavoritesView } from '../views/customer/FavoritesView';
 
 // Admin Views
 import { AdminDashboardView } from '../views/admin/AdminDashboardView';
@@ -28,6 +29,7 @@ import { AdminBookingsView } from '../views/admin/AdminBookingsView';
 import { AdminTablesView } from '../views/admin/AdminTablesView';
 import { AdminMenuView } from '../views/admin/AdminMenuView';
 import { AdminUsersView } from '../views/admin/AdminUsersView';
+import { AdminUserTrackingView } from '../views/admin/AdminUserTrackingView';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -115,6 +117,7 @@ export function AppNavigator() {
         <Stack.Screen name="BookingDetail" component={BookingDetailView} />
         <Stack.Screen name="MyBookings" component={MyBookingsView} />
         <Stack.Screen name="Notifications" component={NotificationsView} />
+        <Stack.Screen name="Favorites" component={FavoritesView} />
 
         {/* Admin Flow */}
         <Stack.Screen name="AdminDashboard" component={AdminDashboardView} />
@@ -122,6 +125,7 @@ export function AppNavigator() {
         <Stack.Screen name="AdminTables" component={AdminTablesView} />
         <Stack.Screen name="AdminMenu" component={AdminMenuView} />
         <Stack.Screen name="AdminUsers" component={AdminUsersView} />
+        <Stack.Screen name="AdminUserTracking" component={AdminUserTrackingView} />
       </Stack.Navigator>
     </NavigationContainer>
   );

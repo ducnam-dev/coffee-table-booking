@@ -4,6 +4,7 @@ import authReducer from './slices/authSlice';
 import tablesReducer from './slices/tablesSlice';
 import menuReducer from './slices/menuSlice';
 import bookingsReducer from './slices/bookingsSlice';
+import trackingReducer from './slices/trackingSlice';
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     tables: tablesReducer,
     menu: menuReducer,
     bookings: bookingsReducer,
+    tracking: trackingReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

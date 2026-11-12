@@ -1,8 +1,9 @@
 import time
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from schemas import CoffeeTable, CoffeeTableCreate
 from database import db
+from middleware import require_role
 
 router = APIRouter(prefix="/api/tables", tags=["tables"])
 
@@ -24,7 +25,7 @@ def get_tables_by_status(status_val: str):
     return [t for t in tables if t.get("status", "").upper() == status_val.upper()]
 
 @router.post("", response_model=CoffeeTable)
-def create_table(table_data: CoffeeTableCreate):
+def create_table(table_data: CoffeeTableCreate, current_user: dict = Depends(require_role("ROLE_MANAGER"))):
     tables = db.data.get("tables", [])
     new_id = int(time.time() * 1000)
     new_table = {
@@ -42,7 +43,7 @@ def create_table(table_data: CoffeeTableCreate):
     return new_table
 
 @router.put("/{table_id}/status", response_model=CoffeeTable)
-def update_table_status(table_id: int, status: str = Query(...)):
+def update_table_status(table_id: int, status: str = Query(...), current_user: dict = Depends(require_role("ROLE_MANAGER"))):
     tables = db.data.get("tables", [])
     for t in tables:
         if t["id"] == table_id:
@@ -52,7 +53,7 @@ def update_table_status(table_id: int, status: str = Query(...)):
     raise HTTPException(status_code=404, detail="Table not found")
 
 @router.delete("/{table_id}")
-def delete_table(table_id: int):
+def delete_table(table_id: int, current_user: dict = Depends(require_role("ROLE_MANAGER"))):
     tables = db.data.get("tables", [])
     initial_len = len(tables)
     db.data["tables"] = [t for t in tables if t["id"] != table_id]
@@ -60,4 +61,3 @@ def delete_table(table_id: int):
         db.save()
         return {"message": "Table deleted successfully"}
     raise HTTPException(status_code=404, detail="Table not found")
-

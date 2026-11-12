@@ -193,6 +193,19 @@ export const AdminDashboardView: React.FC<{ navigation: any }> = ({ navigation }
                 </BentoCard>
               </AnimatedScaleButton>
             </View>
+
+            <View style={[styles.navRow, { marginTop: spacing.md }]}>
+              <AnimatedScaleButton
+                onPress={() => navigation.navigate('AdminUserTracking')}
+                style={styles.navBtn}
+              >
+                <BentoCard variant="amber" padding="md" style={styles.navCard}>
+                  <Ionicons name="analytics-outline" size={26} color={colors.primaryDark} />
+                  <Text style={styles.navTitle}>QL Tracking & Analytics</Text>
+                  <Text style={styles.navDesc}>Phân tích món yêu thích & tự động gợi ý</Text>
+                </BentoCard>
+              </AnimatedScaleButton>
+            </View>
           </FadeInView>
 
           {/* Recent Bookings Queue */}

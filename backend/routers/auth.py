@@ -6,9 +6,11 @@ from database import db
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 @router.post("/signin", response_model=JwtResponse)
+@router.post("/login", response_model=JwtResponse)
 def signin(login_data: LoginRequest):
     users = db.data.get("users", [])
-    email_or_user = login_data.email.strip().lower()
+    raw_id = login_data.email or login_data.username or ""
+    email_or_user = raw_id.strip().lower()
     
     # Match by email or username
     matched = None

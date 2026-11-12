@@ -262,5 +262,84 @@
         }
       ]
     }
+  ],
+  "user_tracking": [
+    {
+      "userId": 2,
+      "menuItemId": 1,
+      "action": "favorite",
+      "timestamp": 1731400000000
+    },
+    {
+      "userId": 2,
+      "menuItemId": 1,
+      "action": "view",
+      "timestamp": 1731400010000
+    },
+    {
+      "userId": 2,
+      "menuItemId": 1,
+      "action": "order",
+      "timestamp": 1731400020000
+    },
+    {
+      "userId": 2,
+      "menuItemId": 2,
+      "action": "view",
+      "timestamp": 1731400030000
+    },
+    {
+      "userId": 2,
+      "menuItemId": 3,
+      "action": "view",
+      "timestamp": 1731400040000
+    },
+    {
+      "userId": 2,
+      "menuItemId": 9,
+      "action": "favorite",
+      "timestamp": 1731400050000
+    },
+    {
+      "userId": 2,
+      "menuItemId": 9,
+      "action": "order",
+      "timestamp": 1731400060000
+    },
+    {
+      "userId": 1,
+      "menuItemId": 6,
+      "action": "order",
+      "timestamp": 1731400070000
+    },
+    {
+      "userId": 1,
+      "menuItemId": 10,
+      "action": "view",
+      "timestamp": 1731400080000
+    },
+    {
+      "userId": 2,
+      "menuItemId": 2,
+      "action": "favorite",
+      "timestamp": 1794477120817
+    }
+  ],
+  "user_favorites": [
+    {
+      "userId": 2,
+      "menuItemId": 1,
+      "timestamp": 1731400000000
+    },
+    {
+      "userId": 2,
+      "menuItemId": 9,
+      "timestamp": 1731400050000
+    },
+    {
+      "userId": 2,
+      "menuItemId": 2,
+      "timestamp": 1794477120817
+    }
   ]
 }

@@ -16,7 +16,9 @@ import { BentoCard } from '../../components/BentoCard';
 import { Badge } from '../../components/Badge';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { setMenuItems, addToCart } from '../../store/slices/menuSlice';
+import { addFavoriteItem, removeFavoriteItem, setFavorites } from '../../store/slices/trackingSlice';
 import { MenuModel } from '../../models/MenuModel';
+import { TrackingModel } from '../../models/TrackingModel';
 import { MenuItem, MenuCategory } from '../../types';
 
 interface MenuViewProps {
@@ -34,8 +36,10 @@ const CATEGORIES: { key: MenuCategory | 'ALL'; label: string; icon: any }[] = [
 export const MenuView: React.FC<MenuViewProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const responsive = useResponsive();
+  const user = useAppSelector((state) => state.auth.user);
   const menuItems = useAppSelector((state) => state.menu.items);
   const cart = useAppSelector((state) => state.menu.cart);
+  const favorites = useAppSelector((state) => state.tracking.favorites);
 
   const [selectedCat, setSelectedCat] = useState<MenuCategory | 'ALL'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,7 +48,23 @@ export const MenuView: React.FC<MenuViewProps> = ({ navigation }) => {
     if (menuItems.length === 0) {
       MenuModel.getAllMenuItems().then((data) => dispatch(setMenuItems(data)));
     }
-  }, [dispatch, menuItems.length]);
+    const userId = user?.id || 2;
+    TrackingModel.getFavorites(userId).then((favs) => dispatch(setFavorites(favs)));
+  }, [dispatch, menuItems.length, user]);
+
+  const handleToggleFavorite = async (item: MenuItem) => {
+    const userId = user?.id || 2;
+    const isFav = favorites.includes(item.id);
+    if (isFav) {
+      dispatch(removeFavoriteItem(item.id));
+      await TrackingModel.removeFavorite(userId, item.id);
+      TrackingModel.trackEvent(userId, item.id, 'unfavorite');
+    } else {
+      dispatch(addFavoriteItem(item.id));
+      await TrackingModel.addFavorite(userId, item.id);
+      TrackingModel.trackEvent(userId, item.id, 'favorite');
+    }
+  };
 
   const filteredItems = menuItems.filter((item) => {
     const matchCat = selectedCat === 'ALL' || item.category === selectedCat;
@@ -154,21 +174,42 @@ export const MenuView: React.FC<MenuViewProps> = ({ navigation }) => {
                         <Text style={styles.itemPrice}>
                           {item.price.toLocaleString('vi-VN')} đ
                         </Text>
-                        <AnimatedScaleButton
-                          onPress={() => {
-                            dispatch(
-                              addToCart({
-                                menuItemId: item.id,
-                                name: item.name,
-                                price: item.price,
-                                quantity: 1,
-                              })
-                            );
-                          }}
-                          style={styles.addBtn}
-                        >
-                          <Ionicons name="add" size={18} color={colors.textInverse} />
-                        </AnimatedScaleButton>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                          <AnimatedScaleButton
+                            onPress={() => handleToggleFavorite(item)}
+                            style={{
+                              width: 34,
+                              height: 34,
+                              borderRadius: radius.sm,
+                              backgroundColor: favorites.includes(item.id) ? 'rgba(239, 68, 68, 0.12)' : colors.surfaceSubtle,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <Ionicons
+                              name={favorites.includes(item.id) ? 'heart' : 'heart-outline'}
+                              size={18}
+                              color={favorites.includes(item.id) ? colors.danger : colors.textMuted}
+                            />
+                          </AnimatedScaleButton>
+                          <AnimatedScaleButton
+                            onPress={() => {
+                              const userId = user?.id || 2;
+                              TrackingModel.trackEvent(userId, item.id, 'order');
+                              dispatch(
+                                addToCart({
+                                  menuItemId: item.id,
+                                  name: item.name,
+                                  price: item.price,
+                                  quantity: 1,
+                                })
+                              );
+                            }}
+                            style={styles.addBtn}
+                          >
+                            <Ionicons name="add" size={18} color={colors.textInverse} />
+                          </AnimatedScaleButton>
+                        </View>
                       </View>
                     </View>
                   </BentoCard>

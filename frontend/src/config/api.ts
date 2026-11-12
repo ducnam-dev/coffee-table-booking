@@ -19,6 +19,10 @@ export const API_CONFIG = {
     RESERVATIONS: '/reservations',
     USERS: '/users',
     AI_RECOMMEND: '/ai/recommend',
+    TRACKING_EVENT: '/tracking/event',
+    TRACKING_FAVORITES: '/tracking/favorites',
+    TRACKING_RECOMMENDATIONS: '/tracking/recommendations',
+    TRACKING_ANALYTICS: '/tracking/analytics',
   },
 };
 

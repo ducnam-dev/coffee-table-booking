@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,8 +13,10 @@ import { AnimatedScaleButton } from '../../components/AnimatedScaleButton';
 import { FadeInView } from '../../components/FadeInView';
 import { BentoCard } from '../../components/BentoCard';
 import { Badge } from '../../components/Badge';
-import { useAppDispatch } from '../../store';
+import { useAppDispatch, useAppSelector } from '../../store';
 import { addToCart } from '../../store/slices/menuSlice';
+import { addFavoriteItem, removeFavoriteItem } from '../../store/slices/trackingSlice';
+import { TrackingModel } from '../../models/TrackingModel';
 import { MenuItem } from '../../types';
 
 interface DrinkDetailViewProps {
@@ -25,6 +27,28 @@ interface DrinkDetailViewProps {
 export const DrinkDetailView: React.FC<DrinkDetailViewProps> = ({ route, navigation }) => {
   const { drink } = route.params;
   const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.auth.user);
+  const favorites = useAppSelector((state) => state.tracking.favorites);
+
+  useEffect(() => {
+    const userId = user?.id || 2;
+    TrackingModel.trackEvent(userId, drink.id, 'view');
+  }, [user, drink.id]);
+
+  const isFavorite = favorites.includes(drink.id);
+
+  const handleToggleFavorite = async () => {
+    const userId = user?.id || 2;
+    if (isFavorite) {
+      dispatch(removeFavoriteItem(drink.id));
+      await TrackingModel.removeFavorite(userId, drink.id);
+      TrackingModel.trackEvent(userId, drink.id, 'unfavorite');
+    } else {
+      dispatch(addFavoriteItem(drink.id));
+      await TrackingModel.addFavorite(userId, drink.id);
+      TrackingModel.trackEvent(userId, drink.id, 'favorite');
+    }
+  };
 
   const [quantity, setQuantity] = useState(1);
   const [size, setSize] = useState<'M' | 'L'>('M');
@@ -57,6 +81,8 @@ export const DrinkDetailView: React.FC<DrinkDetailViewProps> = ({ route, navigat
   };
 
   const handleAddToCart = () => {
+    const userId = user?.id || 2;
+    TrackingModel.trackEvent(userId, drink.id, 'order');
     dispatch(
       addToCart({
         menuItemId: drink.id,
@@ -83,6 +109,13 @@ export const DrinkDetailView: React.FC<DrinkDetailViewProps> = ({ route, navigat
           <Image source={{ uri: drink.image }} style={styles.heroImage} />
           <AnimatedScaleButton onPress={() => navigation.goBack()} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
+          </AnimatedScaleButton>
+          <AnimatedScaleButton onPress={handleToggleFavorite} style={styles.favTopBtn}>
+            <Ionicons
+              name={isFavorite ? 'heart' : 'heart-outline'}
+              size={22}
+              color={isFavorite ? colors.danger : colors.textPrimary}
+            />
           </AnimatedScaleButton>
         </View>
 
@@ -236,6 +269,18 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 48,
     left: spacing.lg,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.medium,
+  },
+  favTopBtn: {
+    position: 'absolute',
+    top: 48,
+    right: spacing.lg,
     width: 44,
     height: 44,
     borderRadius: 22,

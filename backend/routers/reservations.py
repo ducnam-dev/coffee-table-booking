@@ -1,27 +1,29 @@
 import time
 from typing import List
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from schemas import Reservation, ReservationCreate
 from database import db
+from middleware import get_current_user, require_role
 
 router = APIRouter(prefix="/api/reservations", tags=["reservations"])
 
 @router.get("", response_model=List[Reservation])
-def get_all_reservations():
+def get_all_reservations(current_user: dict = Depends(require_role("ROLE_MANAGER"))):
     return db.data.get("reservations", [])
 
 @router.get("/user/{user_id}", response_model=List[Reservation])
-def get_reservations_by_user(user_id: int):
+def get_reservations_by_user(user_id: int, current_user: dict = Depends(get_current_user)):
+    """User can only view their own reservations; MANAGER can view any user's."""
+    if current_user.get("role") != "ROLE_MANAGER" and current_user.get("id") != user_id:
+        raise HTTPException(status_code=403, detail="Bạn chỉ có thể xem đơn đặt bàn của mình")
     reservations = db.data.get("reservations", [])
-    # Return user's reservations or all if test user
-    matched = [r for r in reservations if r.get("userId") == user_id]
-    return matched if matched else reservations
+    return [r for r in reservations if r.get("userId") == user_id]
 
 @router.post("", response_model=Reservation)
 def create_reservation(res_data: ReservationCreate):
     reservations = db.data.get("reservations", [])
     tables = db.data.get("tables", [])
-    
+
     new_id = int(time.time() * 1000)
     new_reservation = {
         "id": new_id,
@@ -38,7 +40,7 @@ def create_reservation(res_data: ReservationCreate):
         "orderItems": res_data.orderItems or []
     }
     reservations.insert(0, new_reservation)
-    
+
     # Update table status to RESERVED if table selected
     table_id = res_data.coffeeTable.get("id") if res_data.coffeeTable else None
     if table_id:
@@ -51,14 +53,14 @@ def create_reservation(res_data: ReservationCreate):
     return new_reservation
 
 @router.put("/{res_id}/status", response_model=Reservation)
-def update_reservation_status(res_id: int, status: str = Query(...)):
+def update_reservation_status(res_id: int, status: str = Query(...), current_user: dict = Depends(require_role("ROLE_MANAGER"))):
     reservations = db.data.get("reservations", [])
     tables = db.data.get("tables", [])
-    
+
     for r in reservations:
         if r["id"] == res_id:
             r["status"] = status
-            
+
             # If confirmed or cancelled, reflect on table
             table_id = r.get("coffeeTable", {}).get("id")
             if table_id:
@@ -69,9 +71,8 @@ def update_reservation_status(res_id: int, status: str = Query(...)):
                         elif status == "CONFIRMED":
                             t["status"] = "OCCUPIED"
                         break
-                        
+
             db.save()
             return r
-            
-    raise HTTPException(status_code=404, detail="Reservation not found")
 
+    raise HTTPException(status_code=404, detail="Reservation not found")

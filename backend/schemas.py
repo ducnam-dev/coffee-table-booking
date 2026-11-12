@@ -1,9 +1,10 @@
-from typing import List, Optional, Any
-from pydantic import BaseModel, EmailStr
+from typing import List, Optional, Any, Dict
+from pydantic import BaseModel
 
 # Auth Schemas
 class LoginRequest(BaseModel):
-    email: str
+    email: Optional[str] = None
+    username: Optional[str] = None
     password: str
 
 class SignupRequest(BaseModel):
@@ -94,3 +95,25 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
 
+# ── Tracking & Favorites Schemas ────────────────────────────────────────────
+
+class TrackingEvent(BaseModel):
+    userId: int
+    menuItemId: int
+    action: str  # "view", "order", "favorite", "unfavorite"
+
+class FavoriteItem(BaseModel):
+    userId: int
+    menuItemId: int
+    timestamp: Optional[int] = None
+
+class RecommendationResponse(BaseModel):
+    personalRecommendations: List[Dict[str, Any]] = []
+    trendingItems: List[Dict[str, Any]] = []
+    reason: str = ""
+
+class ProductAnalytics(BaseModel):
+    mostFavorited: List[Dict[str, Any]] = []
+    mostViewed: List[Dict[str, Any]] = []
+    mostOrdered: List[Dict[str, Any]] = []
+    totalEvents: int = 0

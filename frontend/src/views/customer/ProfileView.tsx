@@ -152,6 +152,19 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ navigation }) => {
           <View style={styles.divider} />
 
           <AnimatedScaleButton
+            onPress={() => navigation.navigate('Favorites')}
+            style={styles.menuItem}
+          >
+            <View style={styles.menuItemLeft}>
+              <Ionicons name="heart-outline" size={20} color={colors.danger} />
+              <Text style={styles.menuItemText}>Sản phẩm yêu thích & Gợi ý</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+          </AnimatedScaleButton>
+
+          <View style={styles.divider} />
+
+          <AnimatedScaleButton
             onPress={() => navigation.navigate('AICoffeeAssistant')}
             style={styles.menuItem}
           >

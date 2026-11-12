@@ -83,13 +83,32 @@ DEFAULT_RESERVATIONS = [
     }
 ]
 
+DEFAULT_TRACKING = [
+    {"userId": 2, "menuItemId": 1, "action": "favorite", "timestamp": 1731400000000},
+    {"userId": 2, "menuItemId": 1, "action": "view", "timestamp": 1731400010000},
+    {"userId": 2, "menuItemId": 1, "action": "order", "timestamp": 1731400020000},
+    {"userId": 2, "menuItemId": 2, "action": "view", "timestamp": 1731400030000},
+    {"userId": 2, "menuItemId": 3, "action": "view", "timestamp": 1731400040000},
+    {"userId": 2, "menuItemId": 9, "action": "favorite", "timestamp": 1731400050000},
+    {"userId": 2, "menuItemId": 9, "action": "order", "timestamp": 1731400060000},
+    {"userId": 1, "menuItemId": 6, "action": "order", "timestamp": 1731400070000},
+    {"userId": 1, "menuItemId": 10, "action": "view", "timestamp": 1731400080000},
+]
+
+DEFAULT_FAVORITES = [
+    {"userId": 2, "menuItemId": 1, "timestamp": 1731400000000},
+    {"userId": 2, "menuItemId": 9, "timestamp": 1731400050000},
+]
+
 class Database:
     def __init__(self):
         self.data: Dict[str, List[Dict[str, Any]]] = {
             "users": DEFAULT_USERS,
             "tables": DEFAULT_TABLES,
             "menu": DEFAULT_MENU,
-            "reservations": DEFAULT_RESERVATIONS
+            "reservations": DEFAULT_RESERVATIONS,
+            "user_tracking": DEFAULT_TRACKING,
+            "user_favorites": DEFAULT_FAVORITES
         }
         self.load()
 

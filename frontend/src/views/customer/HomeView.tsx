@@ -20,6 +20,8 @@ import { setMenuItems } from '../../store/slices/menuSlice';
 import { setTables } from '../../store/slices/tablesSlice';
 import { MenuModel } from '../../models/MenuModel';
 import { TableModel } from '../../models/TableModel';
+import { TrackingModel } from '../../models/TrackingModel';
+import { setRecommendations } from '../../store/slices/trackingSlice';
 import { MenuItem, CoffeeTable } from '../../types';
 
 interface HomeViewProps {
@@ -32,11 +34,14 @@ export const HomeView: React.FC<HomeViewProps> = ({ navigation }) => {
   const user = useAppSelector((state) => state.auth.user);
   const menuItems = useAppSelector((state) => state.menu.items);
   const tables = useAppSelector((state) => state.tables.tables);
+  const recommendations = useAppSelector((state) => state.tracking.recommendations);
 
   useEffect(() => {
     MenuModel.getAllMenuItems().then((data) => dispatch(setMenuItems(data)));
     TableModel.getAllTables().then((data) => dispatch(setTables(data)));
-  }, [dispatch]);
+    const userId = user?.id || 2;
+    TrackingModel.getRecommendations(userId).then((data) => dispatch(setRecommendations(data)));
+  }, [dispatch, user]);
 
   const signatureDrinks = menuItems.filter((i) => i.isSignature).slice(0, 4);
   const availableTablesCount = tables.filter((t) => t.status === 'AVAILABLE').length;
@@ -191,6 +196,54 @@ export const HomeView: React.FC<HomeViewProps> = ({ navigation }) => {
           ))}
         </ScrollView>
       </FadeInView>
+
+      {/* Personalized Recommendations Section */}
+      {recommendations?.personalRecommendations && recommendations.personalRecommendations.length > 0 && (
+        <FadeInView delay={280} style={styles.sectionWrap}>
+          <SectionHeader
+            title="Gợi Ý Dành Cho Bạn"
+            subtitle={recommendations.reason || "Dựa trên thức uống bạn yêu thích & quan tâm"}
+            actionText="Xem tất cả"
+            onActionPress={() => navigation.navigate('Favorites')}
+          />
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalScroll}
+          >
+            {recommendations.personalRecommendations.map((rec: any, idx: number) => {
+              const matched = menuItems.find((m) => m.id === rec.id) || rec;
+              return (
+                <AnimatedScaleButton
+                  key={rec.id || idx}
+                  onPress={() => navigation.navigate('DrinkDetail', { drink: matched })}
+                  style={styles.drinkCardTouchable}
+                >
+                  <BentoCard variant="amber" padding="sm" style={styles.drinkCard}>
+                    {matched.image ? (
+                      <Image source={{ uri: matched.image }} style={styles.drinkImage} />
+                    ) : (
+                      <View style={[styles.drinkImage, { alignItems: 'center', justifyContent: 'center' }]}>
+                        <Ionicons name="sparkles" size={28} color={colors.primaryDark} />
+                      </View>
+                    )}
+                    <View style={styles.drinkBody}>
+                      <Badge label="GỢI Ý GU BẠN" variant="amber" style={styles.signatureBadge} />
+                      <Text style={styles.drinkName} numberOfLines={1}>
+                        {matched.name}
+                      </Text>
+                      <Text style={styles.drinkPrice}>
+                        {(matched.price || 0).toLocaleString('vi-VN')} đ
+                      </Text>
+                    </View>
+                  </BentoCard>
+                </AnimatedScaleButton>
+              );
+            })}
+          </ScrollView>
+        </FadeInView>
+      )}
 
       {/* Highlights / Features Banner */}
       <FadeInView delay={300} style={styles.featuresCardWrap}>
