@@ -144,20 +144,29 @@ export const BookingDetailView: React.FC<BookingDetailViewProps> = ({ route, nav
         {/* Action Buttons */}
         <View style={styles.actionsRow}>
           <AnimatedScaleButton
-            onPress={() => Alert.alert('Hotline Quán', 'Gọi 0901 234 567 để được hỗ trợ tức thì.')}
-            style={styles.contactBtn}
+            onPress={() => navigation.navigate('MyBookings')}
+            style={styles.historyBtn}
           >
-            <Ionicons name="call-outline" size={18} color={colors.textPrimary} />
-            <Text style={styles.contactBtnText}>Liên Hệ Quán</Text>
+            <Ionicons name="time-outline" size={18} color={colors.primaryDark} />
+            <Text style={styles.historyBtnText}>Lịch Sử Đặt Bàn</Text>
           </AnimatedScaleButton>
 
           <AnimatedScaleButton
             onPress={() => navigation.navigate('CustomerTabs', { screen: 'Home' })}
             style={styles.homeBtn}
           >
+            <Ionicons name="home-outline" size={18} color={colors.textInverse} />
             <Text style={styles.homeBtnText}>Về Trang Chủ</Text>
           </AnimatedScaleButton>
         </View>
+
+        <AnimatedScaleButton
+          onPress={() => Alert.alert('Hotline Quán', 'Gọi 0901 234 567 để được hỗ trợ tức thì.')}
+          style={styles.contactSecondaryBtn}
+        >
+          <Ionicons name="call-outline" size={15} color={colors.textMuted} />
+          <Text style={styles.contactSecondaryBtnText}>Cần hỗ trợ? Gọi hotline quán 0901 234 567</Text>
+        </AnimatedScaleButton>
       </ScrollView>
     </SafeAreaView>
   );
@@ -353,35 +362,50 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     marginTop: spacing.xl,
   },
-  contactBtn: {
+  historyBtn: {
     flex: 1,
     height: 48,
     borderRadius: radius.md,
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: 1.5,
+    borderColor: colors.primaryDark,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.xs,
   },
-  contactBtnText: {
+  historyBtnText: {
     ...typography.bodyLarge,
-    fontWeight: '600',
+    color: colors.primaryDark,
+    fontWeight: '700',
   },
   homeBtn: {
     flex: 1,
     height: 48,
     borderRadius: radius.md,
     backgroundColor: colors.espresso,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: spacing.xs,
     ...shadows.soft,
   },
   homeBtnText: {
     ...typography.bodyLarge,
     color: colors.textInverse,
     fontWeight: '700',
+  },
+  contactSecondaryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  contactSecondaryBtnText: {
+    ...typography.bodySmall,
+    color: colors.textMuted,
   },
 });
 

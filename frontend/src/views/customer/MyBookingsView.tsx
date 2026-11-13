@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,7 +19,7 @@ import { BentoCard } from '../../components/BentoCard';
 import { Badge, BadgeVariant } from '../../components/Badge';
 import { MyBookingsPresenter, MyBookingsViewInterface } from '../../presenters/MyBookingsPresenter';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { setReservations } from '../../store/slices/bookingsSlice';
+import { setReservations, updateReservationStatusInStore } from '../../store/slices/bookingsSlice';
 import { Reservation, ReservationStatus } from '../../types';
 
 interface MyBookingsViewProps {
@@ -35,24 +36,34 @@ const TABS: { key: ReservationStatus | 'ALL'; label: string }[] = [
 export const MyBookingsView: React.FC<MyBookingsViewProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const responsive = useResponsive();
+  const user = useAppSelector((state) => state.auth.user);
   const reservations = useAppSelector((state) => state.bookings.reservations);
 
   const [loading, setLoading] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<ReservationStatus | 'ALL'>('ALL');
 
-  const viewCallbacks: MyBookingsViewInterface = {
-    showLoading: (l) => setLoading(l),
-    showError: (msg) => Alert.alert('Lỗi', msg),
-    renderBookings: (data) => dispatch(setReservations(data)),
-  };
+  const viewCallbacks: MyBookingsViewInterface = useMemo(
+    () => ({
+      showLoading: (l) => setLoading(l),
+      showError: (msg) => Alert.alert('Lỗi', msg),
+      renderBookings: (data) => dispatch(setReservations(data)),
+    }),
+    [dispatch]
+  );
 
-  const presenter = new MyBookingsPresenter(viewCallbacks);
+  const presenterRef = useRef<MyBookingsPresenter | null>(null);
+  if (!presenterRef.current) {
+    presenterRef.current = new MyBookingsPresenter(viewCallbacks);
+  } else {
+    presenterRef.current.setView(viewCallbacks);
+  }
+  const presenter = presenterRef.current;
 
   useEffect(() => {
-    presenter.loadMyBookings();
-  }, []);
+    presenter.loadMyBookings(user?.id);
+  }, [user?.id]);
 
-  const filtered = presenter.filterByStatus(selectedStatus);
+  const filtered = presenter.filterByStatus(selectedStatus, reservations);
 
   const getStatusBadge = (status: ReservationStatus): { label: string; variant: BadgeVariant } => {
     switch (status) {
@@ -76,7 +87,10 @@ export const MyBookingsView: React.FC<MyBookingsViewProps> = ({ navigation }) =>
         {
           text: 'Hủy Bàn',
           style: 'destructive',
-          onPress: () => presenter.cancelBooking(booking.id),
+          onPress: async () => {
+            await presenter.cancelBooking(booking.id);
+            dispatch(updateReservationStatusInStore({ id: booking.id, status: 'CANCELLED' }));
+          },
         },
       ]
     );
@@ -99,7 +113,9 @@ export const MyBookingsView: React.FC<MyBookingsViewProps> = ({ navigation }) =>
             <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
           </AnimatedScaleButton>
           <Text style={styles.title} numberOfLines={1}>Lịch Sử Đặt Bàn</Text>
-          <View style={{ width: 44 }} />
+          <AnimatedScaleButton onPress={() => presenter.loadMyBookings(user?.id)} style={styles.backBtn}>
+            <Ionicons name="refresh" size={20} color={colors.textPrimary} />
+          </AnimatedScaleButton>
         </View>
         <ScrollView
           horizontal
@@ -144,6 +160,16 @@ export const MyBookingsView: React.FC<MyBookingsViewProps> = ({ navigation }) =>
             { paddingHorizontal: responsive.horizontalPadding },
           ]}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={() => {
+                presenter.loadMyBookings(user?.id);
+              }}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
+            />
+          }
         >
           {filtered.map((booking, idx) => {
             const badge = getStatusBadge(booking.status);

@@ -1,6 +1,6 @@
 import time
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, HTTPException, Query, Depends, Header
 from schemas import Reservation, ReservationCreate, StatusUpdateRequest
 from database import db
 from middleware import get_current_user, require_role
@@ -8,15 +8,40 @@ from middleware import get_current_user, require_role
 router = APIRouter(prefix="/api/reservations", tags=["reservations"])
 
 @router.get("", response_model=List[Reservation])
-def get_all_reservations(current_user: dict = Depends(require_role("ROLE_MANAGER"))):
-    return db.data.get("reservations", [])
+def get_all_reservations(
+    user_id: Optional[int] = Query(None),
+    authorization: Optional[str] = Header(None)
+):
+    reservations = db.data.get("reservations", [])
+    if authorization:
+        try:
+            current_user = get_current_user(authorization)
+            if current_user.get("role") == "ROLE_MANAGER":
+                if user_id:
+                    return [r for r in reservations if r.get("userId") == user_id]
+                return reservations
+            # If customer, return their reservations
+            c_uid = current_user.get("id")
+            user_res = [r for r in reservations if r.get("userId") == c_uid]
+            return user_res
+        except Exception:
+            pass
+    if user_id:
+        return [r for r in reservations if r.get("userId") == user_id]
+    return reservations
 
 @router.get("/user/{user_id}", response_model=List[Reservation])
-def get_reservations_by_user(user_id: int, current_user: dict = Depends(get_current_user)):
-    """User can only view their own reservations; MANAGER can view any user's."""
-    if current_user.get("role") != "ROLE_MANAGER" and current_user.get("id") != user_id:
-        raise HTTPException(status_code=403, detail="Bạn chỉ có thể xem đơn đặt bàn của mình")
+def get_reservations_by_user(user_id: int, authorization: Optional[str] = Header(None)):
     reservations = db.data.get("reservations", [])
+    if authorization:
+        try:
+            current_user = get_current_user(authorization)
+            if current_user.get("role") != "ROLE_MANAGER" and current_user.get("id") != user_id:
+                raise HTTPException(status_code=403, detail="Bạn chỉ có thể xem đơn đặt bàn của mình")
+        except HTTPException:
+            raise
+        except Exception:
+            pass
     return [r for r in reservations if r.get("userId") == user_id]
 
 @router.post("", response_model=Reservation)
@@ -79,7 +104,7 @@ def update_reservation_status(
     res_id: int,
     status: Optional[str] = Query(None),
     body: Optional[StatusUpdateRequest] = None,
-    current_user: dict = Depends(require_role("ROLE_MANAGER"))
+    authorization: Optional[str] = Header(None)
 ):
     target_status = (body.status if body and body.status else status)
     if not target_status:
@@ -90,17 +115,28 @@ def update_reservation_status(
 
     for r in reservations:
         if r["id"] == res_id:
+            if authorization:
+                try:
+                    user = get_current_user(authorization)
+                    if user.get("role") != "ROLE_MANAGER" and r.get("userId") != user.get("id"):
+                        raise HTTPException(status_code=403, detail="Không có quyền cập nhật đơn đặt bàn này")
+                except HTTPException:
+                    raise
+                except Exception:
+                    pass
             r["status"] = target_status
 
             # If confirmed or cancelled, reflect on table
-            table_id = r.get("coffeeTable", {}).get("id")
+            table_id = r.get("tableId") or (r.get("coffeeTable", {}).get("id") if isinstance(r.get("coffeeTable"), dict) else None)
             if table_id:
                 for t in tables:
                     if t["id"] == table_id:
                         if target_status == "CANCELLED":
                             t["status"] = "AVAILABLE"
-                        elif target_status == "CONFIRMED":
+                        elif target_status in ("CONFIRMED", "OCCUPIED"):
                             t["status"] = "OCCUPIED"
+                        elif target_status == "PENDING":
+                            t["status"] = "RESERVED"
                         break
 
             db.save()

@@ -27,7 +27,7 @@
       "name": "Bàn 01 (Cửa sổ)",
       "seats": 2,
       "type": "Cặp đôi",
-      "status": "OCCUPIED",
+      "status": "AVAILABLE",
       "isNearWindow": true,
       "isOutdoor": false,
       "hasSocket": true
@@ -182,6 +182,40 @@
     }
   ],
   "reservations": [
+    {
+      "id": 1794595300934,
+      "customerName": "Test Khach",
+      "customerPhone": "0988776655",
+      "phone": "0988776655",
+      "customerEmail": "",
+      "email": "",
+      "userId": 2,
+      "tableId": 1,
+      "tableNumber": "B01",
+      "coffeeTable": {
+        "id": 1,
+        "name": "Bàn 01 (Cửa sổ)",
+        "seats": 2,
+        "type": "Cặp đôi",
+        "status": "AVAILABLE",
+        "isNearWindow": true,
+        "isOutdoor": false,
+        "hasSocket": true
+      },
+      "reservationDate": "2026-11-14",
+      "reservationTime": "14:00",
+      "timeDisplay": "14:00 - 2026-11-14",
+      "guestNumber": 2,
+      "guestCount": 2,
+      "note": "",
+      "specialRequests": "",
+      "status": "CANCELLED",
+      "orderItems": [],
+      "totalAmount": 0,
+      "depositAmount": 50000,
+      "qrCode": "PAM-RES-0934",
+      "createdAt": "2026-11-14 01:41"
+    },
     {
       "id": 1794594779721,
       "customerName": "Nguyen Van Khach",

@@ -40,10 +40,31 @@ let MOCK_RESERVATIONS: Reservation[] = [
 
 export function normalizeReservation(raw: any, fallback?: Partial<Reservation>): Reservation {
   const tableId = raw.tableId || raw.coffeeTable?.id || fallback?.tableId || 1;
-  let tableNumber = raw.tableNumber || raw.coffeeTable?.name || fallback?.tableNumber;
+  let tableNumber = raw.tableNumber || raw.coffeeTable?.tableNumber || raw.coffeeTable?.name || fallback?.tableNumber;
+  if (typeof tableNumber === 'string') {
+    tableNumber = tableNumber.replace(/^Bàn\s*/i, '').trim();
+  }
   if (!tableNumber) {
     tableNumber = `B0${tableId}`;
   }
+
+  const rawItems = raw.orderItems || fallback?.orderItems || [];
+  const normalizedItems = rawItems.map((item: any) => {
+    if (item.menuItem) {
+      return {
+        menuItemId: item.menuItem.id,
+        name: item.menuItem.name,
+        price: item.menuItem.price,
+        quantity: item.quantity || 1,
+      };
+    }
+    return {
+      menuItemId: item.menuItemId || item.id || 1,
+      name: item.name || 'Món nước',
+      price: item.price || 0,
+      quantity: item.quantity || 1,
+    };
+  });
 
   return {
     id: raw.id || Date.now(),
@@ -55,7 +76,7 @@ export function normalizeReservation(raw: any, fallback?: Partial<Reservation>):
     reservationDate: raw.reservationDate || fallback?.reservationDate || new Date().toISOString().split('T')[0],
     reservationTime: raw.reservationTime || fallback?.reservationTime || '09:00',
     guestCount: raw.guestCount || raw.guestNumber || fallback?.guestCount || 2,
-    orderItems: raw.orderItems || fallback?.orderItems || [],
+    orderItems: normalizedItems,
     totalAmount: raw.totalAmount || fallback?.totalAmount || 0,
     depositAmount: raw.depositAmount || fallback?.depositAmount || 50000,
     status: raw.status || 'PENDING',
@@ -66,11 +87,14 @@ export function normalizeReservation(raw: any, fallback?: Partial<Reservation>):
 }
 
 export class ReservationModel {
-  static async getAllReservations(): Promise<Reservation[]> {
+  static async getAllReservations(userId?: number): Promise<Reservation[]> {
     try {
-      const res = await axiosClient.get('/reservations');
+      const url = userId ? `/reservations?user_id=${userId}` : '/reservations';
+      const res = await axiosClient.get(url);
       if (Array.isArray(res.data)) {
-        return res.data.map((r: any) => normalizeReservation(r));
+        const normalized = res.data.map((r: any) => normalizeReservation(r));
+        MOCK_RESERVATIONS = normalized;
+        return normalized;
       }
       return MOCK_RESERVATIONS;
     } catch {
