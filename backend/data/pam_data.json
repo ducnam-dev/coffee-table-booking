@@ -57,7 +57,7 @@
       "name": "Bàn 04 (Gác lửng)",
       "seats": 2,
       "type": "Gác lửng",
-      "status": "RESERVED",
+      "status": "AVAILABLE",
       "isNearWindow": true,
       "isOutdoor": false,
       "hasSocket": true
@@ -243,7 +243,7 @@
       "guestCount": 2,
       "note": "",
       "specialRequests": "",
-      "status": "PENDING",
+      "status": "CANCELLED",
       "orderItems": [],
       "totalAmount": 0,
       "depositAmount": 50000,
@@ -347,7 +347,7 @@
       "reservationTime": "2026-11-10T19:00:00",
       "timeDisplay": "19:00 - Hôm nay",
       "guestNumber": 2,
-      "status": "PENDING",
+      "status": "CANCELLED",
       "note": "Cần góc yên tĩnh gần cửa sổ",
       "orderItems": [
         {

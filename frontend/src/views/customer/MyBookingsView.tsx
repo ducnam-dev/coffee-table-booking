@@ -69,13 +69,13 @@ export const MyBookingsView: React.FC<MyBookingsViewProps> = ({ navigation }) =>
   const getStatusBadge = (status: ReservationStatus): { label: string; variant: BadgeVariant } => {
     switch (status) {
       case 'CONFIRMED':
-        return { label: 'Đã Xác Nhận', variant: 'success' };
+        return { label: 'Đã xác nhận', variant: 'success' };
       case 'PENDING':
-        return { label: 'Chờ Quán Duyệt', variant: 'warning' };
+        return { label: 'Chờ duyệt', variant: 'warning' };
       case 'CANCELLED':
-        return { label: 'Đã Hủy', variant: 'danger' };
+        return { label: 'Đã hủy', variant: 'danger' };
       case 'COMPLETED':
-        return { label: 'Đã Hoàn Thành', variant: 'info' };
+        return { label: 'Hoàn thành', variant: 'info' };
     }
   };
 
@@ -89,8 +89,11 @@ export const MyBookingsView: React.FC<MyBookingsViewProps> = ({ navigation }) =>
           text: 'Hủy Bàn',
           style: 'destructive',
           onPress: async () => {
-            await presenter.cancelBooking(booking.id);
-            dispatch(updateReservationStatusInStore({ id: booking.id, status: 'CANCELLED' }));
+            const success = await presenter.cancelBooking(booking.id, reservations);
+            if (success) {
+              dispatch(updateReservationStatusInStore({ id: booking.id, status: 'CANCELLED' }));
+              Alert.alert('Thành Công', 'Đã hủy đặt bàn thành công.');
+            }
           },
         },
       ]
