@@ -34,12 +34,22 @@ export class BookingPresenter {
     orderItems: OrderItem[];
     specialRequests?: string;
   }): Promise<void> {
-    if (!bookingData.customerName.trim()) {
-      this.view.showError('Vui lòng nhập tên người đặt');
+    const cleanName = bookingData.customerName.trim();
+    const cleanPhone = bookingData.phone.replace(/[\s.-]/g, '');
+    const vnPhoneRegex = /^0(3|5|7|8|9)[0-9]{8}$/;
+
+    if (!cleanName) {
+      this.view.showError('Vui lòng nhập họ và tên người nhận bàn');
       return;
     }
-    if (!bookingData.phone.trim()) {
+    if (!cleanPhone) {
       this.view.showError('Vui lòng nhập số điện thoại liên hệ');
+      return;
+    }
+    if (!vnPhoneRegex.test(cleanPhone)) {
+      this.view.showError(
+        'Số điện thoại không hợp lệ! Vui lòng nhập đúng số điện thoại di động Việt Nam gồm 10 chữ số (bắt đầu bằng 03, 05, 07, 08 hoặc 09).'
+      );
       return;
     }
     if (!bookingData.selectedTable) {

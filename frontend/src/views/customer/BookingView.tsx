@@ -41,10 +41,26 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
   const tables = useAppSelector((state) => state.tables.tables);
   const cart = useAppSelector((state) => state.menu.cart);
 
-  const [customerName, setCustomerName] = useState(
-    user?.fullName || user?.username || 'Nguyễn Khách Hàng'
-  );
-  const [phone, setPhone] = useState(user?.phone || '0988776655');
+  const [customerName, setCustomerName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [phoneError, setPhoneError] = useState('');
+
+  const handlePhoneChange = (text: string) => {
+    const cleaned = text.replace(/[^0-9]/g, '').slice(0, 10);
+    setPhone(cleaned);
+    if (cleaned.length === 10) {
+      const vnPhoneRegex = /^0(3|5|7|8|9)[0-9]{8}$/;
+      if (!vnPhoneRegex.test(cleaned)) {
+        setPhoneError('Đầu số không hợp lệ (cần bắt đầu bằng 03, 05, 07, 08, 09)');
+      } else {
+        setPhoneError('');
+      }
+    } else if (cleaned.length > 0 && !cleaned.startsWith('0')) {
+      setPhoneError('Số điện thoại phải bắt đầu bằng chữ số 0');
+    } else {
+      setPhoneError('');
+    }
+  };
   const [guestCount, setGuestCount] = useState(2);
   const [reservationDate, setReservationDate] = useState(() => {
     const today = new Date();
@@ -127,19 +143,25 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
               style={styles.input}
               value={customerName}
               onChangeText={setCustomerName}
-              placeholder="Nguyễn Văn A"
+              placeholder="Nhập họ và tên..."
               placeholderTextColor={colors.textMuted}
             />
 
             <Text style={[styles.label, { marginTop: spacing.md }]}>Số điện thoại liên hệ *</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, phoneError ? styles.inputError : null]}
               value={phone}
-              onChangeText={setPhone}
-              placeholder="0901234567"
+              onChangeText={handlePhoneChange}
+              placeholder="Ví dụ: 0901234567"
               placeholderTextColor={colors.textMuted}
               keyboardType="phone-pad"
+              maxLength={10}
             />
+            {phoneError ? (
+              <Text style={styles.errorText}>{phoneError}</Text>
+            ) : (
+              <Text style={styles.phoneHint}>Quy tắc: 10 chữ số (bắt đầu bằng 03, 05, 07, 08, 09)</Text>
+            )}
           </BentoCard>
         </FadeInView>
 
@@ -445,6 +467,23 @@ const styles = StyleSheet.create({
     height: 44,
     ...typography.body,
     color: colors.textPrimary,
+  },
+  inputError: {
+    borderColor: colors.danger,
+    borderWidth: 1.5,
+  },
+  errorText: {
+    ...typography.caption,
+    color: colors.danger,
+    marginTop: 4,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  phoneHint: {
+    ...typography.caption,
+    color: colors.textMuted,
+    marginTop: 4,
+    fontSize: 11,
   },
   textArea: {
     backgroundColor: colors.surfaceSubtle,

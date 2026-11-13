@@ -95,23 +95,19 @@ export const MenuView: React.FC<MenuViewProps> = ({ route, navigation }) => {
         <View style={styles.headerTopRow}>
           <View style={styles.headerLeftGroup}>
             <AnimatedScaleButton
-              onPress={() => navigation.navigate('CustomerTabs', { screen: 'Booking' })}
+              onPress={() => {
+                if (navigation.canGoBack()) {
+                  navigation.goBack();
+                } else {
+                  navigation.navigate('CustomerTabs', { screen: 'Booking' });
+                }
+              }}
               style={styles.backBtn}
             >
               <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
             </AnimatedScaleButton>
             <Text style={styles.headerTitle}>Thực Đơn Quán</Text>
           </View>
-
-          <AnimatedScaleButton
-            onPress={() => navigation.navigate('CustomerTabs', { screen: 'Booking' })}
-            style={styles.returnBookingHeaderBtn}
-          >
-            <Ionicons name="calendar-outline" size={15} color={colors.primaryDark} />
-            <Text style={styles.returnBookingHeaderText}>
-              {cartTotalItems > 0 ? `Về Đặt Bàn (${cartTotalItems})` : 'Về Đặt Bàn'}
-            </Text>
-          </AnimatedScaleButton>
         </View>
 
         <View style={styles.searchBar}>
@@ -320,22 +316,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...typography.h1,
     fontSize: 22,
-  },
-  returnBookingHeaderBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: colors.primarySubtle,
-    borderWidth: 1,
-    borderColor: colors.primaryDark,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 5,
-  },
-  returnBookingHeaderText: {
-    ...typography.caption,
-    fontWeight: '700',
-    color: colors.primaryDark,
   },
   searchBar: {
     flexDirection: 'row',
