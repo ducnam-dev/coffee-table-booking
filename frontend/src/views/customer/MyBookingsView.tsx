@@ -10,7 +10,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { useResponsive } from '../../theme/responsive';
 import { AnimatedScaleButton } from '../../components/AnimatedScaleButton';
@@ -36,6 +36,7 @@ const TABS: { key: ReservationStatus | 'ALL'; label: string }[] = [
 export const MyBookingsView: React.FC<MyBookingsViewProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const responsive = useResponsive();
+  const insets = useSafeAreaInsets();
   const user = useAppSelector((state) => state.auth.user);
   const reservations = useAppSelector((state) => state.bookings.reservations);
 
@@ -105,7 +106,7 @@ export const MyBookingsView: React.FC<MyBookingsViewProps> = ({ navigation }) =>
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + spacing.xs }]}>
       {/* Header Tabs */}
       <View style={[styles.header, { paddingHorizontal: responsive.horizontalPadding }]}>
         <View style={styles.navRow}>
@@ -253,7 +254,7 @@ export const MyBookingsView: React.FC<MyBookingsViewProps> = ({ navigation }) =>
           )}
         </ScrollView>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

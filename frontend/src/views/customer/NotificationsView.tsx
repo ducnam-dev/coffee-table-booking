@@ -6,7 +6,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius, spacing, typography } from '../../theme/designTokens';
 import { AnimatedScaleButton } from '../../components/AnimatedScaleButton';
 import { FadeInView } from '../../components/FadeInView';
@@ -45,8 +45,10 @@ const NOTIFICATIONS = [
 ];
 
 export const NotificationsView: React.FC<NotificationsViewProps> = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 16) + spacing.xs }]}>
       <View style={styles.header}>
         <AnimatedScaleButton onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
@@ -55,7 +57,13 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({ navigation
         <View style={{ width: 44 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingBottom: Math.max(insets.bottom, 20) + 30 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {NOTIFICATIONS.map((item, idx) => (
           <FadeInView key={item.id} delay={idx * 60} style={styles.itemWrap}>
             <BentoCard
@@ -89,7 +97,7 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({ navigation
           </FadeInView>
         ))}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, typography, shadows, spacing } from '../theme/designTokens';
 
@@ -35,6 +36,9 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function CustomerTabs() {
+  const insets = useSafeAreaInsets();
+  const bottomInset = Math.max(insets.bottom, Platform.OS === 'ios' ? 24 : 8);
+
   return (
     <Tab.Navigator
       id="customer-tabs"
@@ -42,7 +46,15 @@ function CustomerTabs() {
         headerShown: false,
         tabBarActiveTintColor: colors.primaryDark,
         tabBarInactiveTintColor: colors.textMuted,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: {
+          backgroundColor: colors.surface,
+          borderTopWidth: 1,
+          borderTopColor: colors.border,
+          height: 54 + bottomInset,
+          paddingBottom: bottomInset,
+          paddingTop: 6,
+          ...shadows.soft,
+        },
         tabBarLabelStyle: styles.tabBarLabel,
       }}
     >

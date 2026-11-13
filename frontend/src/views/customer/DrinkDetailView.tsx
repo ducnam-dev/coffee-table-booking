@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  Image,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import { View, Text, ScrollView, Image, StyleSheet, Alert } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { AnimatedScaleButton } from '../../components/AnimatedScaleButton';
@@ -27,6 +21,7 @@ interface DrinkDetailViewProps {
 export const DrinkDetailView: React.FC<DrinkDetailViewProps> = ({ route, navigation }) => {
   const { drink } = route.params;
   const dispatch = useAppDispatch();
+  const insets = useSafeAreaInsets();
   const user = useAppSelector((state) => state.auth.user);
   const favorites = useAppSelector((state) => state.tracking.favorites);
 
@@ -106,14 +101,26 @@ export const DrinkDetailView: React.FC<DrinkDetailViewProps> = ({ route, navigat
 
   return (
     <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingBottom: 100 + Math.max(insets.bottom, 12) },
+        ]}
+      >
         {/* Cover Image & Header Controls */}
         <View style={styles.imageContainer}>
           <Image source={{ uri: drink.image }} style={styles.heroImage} />
-          <AnimatedScaleButton onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <AnimatedScaleButton
+            onPress={() => navigation.goBack()}
+            style={[styles.backBtn, { top: Math.max(insets.top + 8, 48) }]}
+          >
             <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
           </AnimatedScaleButton>
-          <AnimatedScaleButton onPress={handleToggleFavorite} style={styles.favTopBtn}>
+          <AnimatedScaleButton
+            onPress={handleToggleFavorite}
+            style={[styles.favTopBtn, { top: Math.max(insets.top + 8, 48) }]}
+          >
             <Ionicons
               name={isFavorite ? 'heart' : 'heart-outline'}
               size={22}
@@ -236,7 +243,15 @@ export const DrinkDetailView: React.FC<DrinkDetailViewProps> = ({ route, navigat
       </ScrollView>
 
       {/* Bottom Sticky Action Bar */}
-      <View style={styles.bottomBar}>
+      <View
+        style={[
+          styles.bottomBar,
+          {
+            height: 56 + Math.max(insets.bottom, 12),
+            paddingBottom: Math.max(insets.bottom, 12),
+          },
+        ]}
+      >
         <View style={styles.bottomBarLeft}>
           <Text style={styles.bottomBarTotalLabel}>Tổng số tiền</Text>
           <Text style={styles.bottomBarTotalPrice}>{finalPrice.toLocaleString('vi-VN')} đ</Text>

@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { useResponsive } from '../../theme/responsive';
@@ -75,12 +76,21 @@ export const MenuView: React.FC<MenuViewProps> = ({ navigation }) => {
     return matchCat && matchSearch;
   });
 
+  const insets = useSafeAreaInsets();
   const cartTotalItems = cart.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
     <View style={styles.container}>
       {/* Header with Search Input */}
-      <View style={[styles.header, { paddingHorizontal: responsive.horizontalPadding }]}>
+      <View
+        style={[
+          styles.header,
+          {
+            paddingHorizontal: responsive.horizontalPadding,
+            paddingTop: Math.max(insets.top, 16) + spacing.xs,
+          },
+        ]}
+      >
         <Text style={styles.headerTitle}>Thực Đơn Quán</Text>
         <View style={styles.searchBar}>
           <Ionicons name="search-outline" size={20} color={colors.textMuted} style={styles.searchIcon} />
@@ -164,7 +174,7 @@ export const MenuView: React.FC<MenuViewProps> = ({ navigation }) => {
                       {item.isSignature && (
                         <Badge label="ĐẶC SẢN" variant="amber" style={styles.badge} />
                       )}
-                      <Text style={styles.itemName} numberOfLines={1}>
+                      <Text style={styles.itemName} numberOfLines={2}>
                         {item.name}
                       </Text>
                       <Text style={styles.itemDesc} numberOfLines={2}>

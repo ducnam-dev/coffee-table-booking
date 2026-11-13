@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { useResponsive } from '../../theme/responsive';
@@ -27,6 +28,7 @@ import { UserModel } from '../../models/UserModel';
 export const AdminDashboardView: React.FC<{ navigation: any }> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const responsive = useResponsive();
+  const insets = useSafeAreaInsets();
   const [data, setData] = useState<AdminDashboardData | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -60,7 +62,15 @@ export const AdminDashboardView: React.FC<{ navigation: any }> = ({ navigation }
   return (
     <View style={styles.container}>
       {/* Top Bar */}
-      <View style={[styles.header, { paddingHorizontal: responsive.horizontalPadding }]}>
+      <View
+        style={[
+          styles.header,
+          {
+            paddingHorizontal: responsive.horizontalPadding,
+            paddingTop: Math.max(insets.top, 16) + spacing.xs,
+          },
+        ]}
+      >
         <View>
           <View style={styles.badgeRow}>
             <Ionicons name="shield-checkmark" size={16} color={colors.primaryDark} />

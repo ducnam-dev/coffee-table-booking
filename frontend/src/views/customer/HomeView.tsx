@@ -7,6 +7,7 @@ import {
   Image,
   Dimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { useResponsive } from '../../theme/responsive';
@@ -43,6 +44,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ navigation }) => {
     TrackingModel.getRecommendations(userId).then((data) => dispatch(setRecommendations(data)));
   }, [dispatch, user]);
 
+  const insets = useSafeAreaInsets();
   const signatureDrinks = menuItems.filter((i) => i.isSignature).slice(0, 4);
   const availableTablesCount = tables.filter((t) => t.status === 'AVAILABLE').length;
 
@@ -51,7 +53,11 @@ export const HomeView: React.FC<HomeViewProps> = ({ navigation }) => {
       style={styles.container}
       contentContainerStyle={[
         styles.contentContainer,
-        { paddingHorizontal: responsive.horizontalPadding },
+        {
+          paddingHorizontal: responsive.horizontalPadding,
+          paddingTop: Math.max(insets.top, 16) + spacing.xs,
+          paddingBottom: 40,
+        },
       ]}
       showsVerticalScrollIndicator={false}
     >

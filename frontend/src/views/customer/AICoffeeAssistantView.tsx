@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { AnimatedScaleButton } from '../../components/AnimatedScaleButton';
@@ -93,13 +94,20 @@ export const AICoffeeAssistantView: React.FC<{ navigation: any }> = ({ navigatio
     navigation.navigate('Booking');
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.container}
     >
       {/* Header */}
-      <View style={styles.header}>
+      <View
+        style={[
+          styles.header,
+          { paddingTop: Math.max(insets.top, 16) + spacing.xs },
+        ]}
+      >
         <View style={styles.headerLeft}>
           <View style={styles.sparkleWrap}>
             <Ionicons name="sparkles" size={20} color={colors.primaryDark} />

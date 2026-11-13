@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { useResponsive } from '../../theme/responsive';
@@ -24,6 +25,7 @@ interface ProfileViewProps {
 export const ProfileView: React.FC<ProfileViewProps> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const responsive = useResponsive();
+  const insets = useSafeAreaInsets();
   const user = useAppSelector((state) => state.auth.user);
 
   const handleLogout = () => {
@@ -69,7 +71,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ navigation }) => {
       style={styles.container}
       contentContainerStyle={[
         styles.scroll,
-        { paddingHorizontal: responsive.horizontalPadding },
+        {
+          paddingHorizontal: responsive.horizontalPadding,
+          paddingTop: Math.max(insets.top, 16) + spacing.xs,
+          paddingBottom: 40,
+        },
       ]}
       showsVerticalScrollIndicator={false}
     >
@@ -86,7 +92,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ navigation }) => {
               <Text style={styles.fullName}>{user?.fullName || 'Khách Hàng'}</Text>
               <Text style={styles.username}>@{user?.username || 'khachhang'}</Text>
               <Badge
-                label={user?.role === 'ROLE_MANAGER' || user?.role === 'ROLE_ADMIN' ? 'QUẢN LÝ (MANAGER)' : 'KHÁCH HÀNG (CUSTOMER)'}
+                label={user?.role === 'ROLE_MANAGER' || user?.role === 'ROLE_ADMIN' ? 'Quản Lý Quán' : 'Khách Thân Thiết'}
                 variant="amber"
                 style={styles.roleBadge}
               />
@@ -100,19 +106,21 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ navigation }) => {
         <Text style={styles.sectionTitle}>Thông Tin Tài Khoản</Text>
         <BentoCard variant="elevated" padding="md">
           <View style={styles.infoRow}>
-            <Ionicons name="mail-outline" size={20} color={colors.textSecondary} />
+            <Ionicons name="mail-outline" size={18} color={colors.textSecondary} />
             <Text style={styles.infoLabel}>Email:</Text>
-            <Text style={styles.infoValue}>{user?.email || 'customer@pamcoffee.vn'}</Text>
+            <Text style={styles.infoValue} numberOfLines={1} ellipsizeMode="middle">
+              {user?.email || 'customer@pamcoffee.vn'}
+            </Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.infoRow}>
-            <Ionicons name="call-outline" size={20} color={colors.textSecondary} />
+            <Ionicons name="call-outline" size={18} color={colors.textSecondary} />
             <Text style={styles.infoLabel}>Điện thoại:</Text>
             <Text style={styles.infoValue}>{user?.phone || '0987 654 321'}</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.infoRow}>
-            <Ionicons name="ribbon-outline" size={20} color={colors.textSecondary} />
+            <Ionicons name="ribbon-outline" size={18} color={colors.textSecondary} />
             <Text style={styles.infoLabel}>Điểm tích lũy:</Text>
             <Text style={[styles.infoValue, { color: colors.primaryDark, fontWeight: '800' }]}>
               450 điểm
@@ -182,7 +190,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ navigation }) => {
             <View style={styles.menuItemLeft}>
               <Ionicons name="shield-checkmark-outline" size={20} color={colors.espresso} />
               <Text style={[styles.menuItemText, { fontWeight: '700' }]}>
-                {user?.role === 'ROLE_MANAGER' || user?.role === 'ROLE_ADMIN' ? 'Mở Dashboard Quản Lý' : 'Chuyển Quyền Quản Lý (Manager)'}
+                {user?.role === 'ROLE_MANAGER' || user?.role === 'ROLE_ADMIN' ? 'Mở Dashboard Quản Lý' : 'Chế Độ Quản Lý (Manager)'}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
@@ -262,11 +270,13 @@ const styles = StyleSheet.create({
   infoLabel: {
     ...typography.bodySmall,
     color: colors.textMuted,
-    width: 100,
+    width: 80,
   },
   infoValue: {
-    ...typography.bodyLarge,
+    ...typography.body,
+    fontSize: 14,
     flex: 1,
+    textAlign: 'right',
   },
   divider: {
     height: 1,
