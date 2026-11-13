@@ -30,9 +30,9 @@ interface BookingViewProps {
 }
 
 const TIME_SLOTS = [
-  '08:00', '09:00', '10:00', '11:00',
-  '14:00', '15:00', '16:00', '17:00',
-  '18:30', '19:30', '20:30',
+  '07:30', '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+  '12:00', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
+  '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00',
 ];
 
 export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) => {
@@ -66,7 +66,7 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
-  const [reservationTime, setReservationTime] = useState('09:00');
+  const [reservationTime, setReservationTime] = useState('');
   const [selectedTable, setSelectedTable] = useState<CoffeeTable | null>(
     route?.params?.preselectedTable || null
   );
@@ -77,9 +77,8 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
     if (tables.length === 0) {
       TableModel.getAllTables().then((data) => {
         dispatch(setTables(data));
-        if (!selectedTable) {
-          const avail = data.find((t) => t.status === 'AVAILABLE');
-          if (avail) setSelectedTable(avail);
+        if (route?.params?.preselectedTable) {
+          setSelectedTable(route.params.preselectedTable);
         }
       });
     }
@@ -88,11 +87,8 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
   useEffect(() => {
     if (route?.params?.preselectedTable) {
       setSelectedTable(route.params.preselectedTable);
-    } else if (!selectedTable && tables.length > 0) {
-      const avail = tables.find((t) => t.status === 'AVAILABLE');
-      if (avail) setSelectedTable(avail);
     }
-  }, [route?.params?.preselectedTable, tables]);
+  }, [route?.params?.preselectedTable]);
 
   const viewCallbacks: BookingViewInterface = {
     showLoading: (l) => setLoading(l),
@@ -197,7 +193,17 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
               placeholderTextColor={colors.textMuted}
             />
 
-            <Text style={[styles.label, { marginTop: spacing.md }]}>Khung giờ đến:</Text>
+            <View style={styles.timeHeaderRow}>
+              <Text style={styles.label}>Khung giờ đến: *</Text>
+              {reservationTime ? (
+                <View style={styles.selectedTimeBadge}>
+                  <Ionicons name="time" size={13} color={colors.primaryDark} />
+                  <Text style={styles.selectedTimeBadgeText}>{reservationTime}</Text>
+                </View>
+              ) : (
+                <Text style={styles.unselectedTimeHint}>(Chạm để chọn giờ)</Text>
+              )}
+            </View>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -229,6 +235,18 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
                 );
               })}
             </ScrollView>
+
+            <View style={styles.customTimeBox}>
+              <Text style={styles.customTimeLabel}>Hoặc tự nhập giờ bạn muốn đến:</Text>
+              <TextInput
+                style={styles.customTimeInput}
+                value={reservationTime}
+                onChangeText={(text) => setReservationTime(text.trim())}
+                placeholder="Ví dụ: 08:45 hoặc 14:15"
+                placeholderTextColor={colors.textMuted}
+                maxLength={5}
+              />
+            </View>
           </BentoCard>
         </FadeInView>
 
@@ -515,6 +533,57 @@ const styles = StyleSheet.create({
     ...typography.bodyLarge,
     fontWeight: '700',
     paddingHorizontal: spacing.md,
+  },
+  timeHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: spacing.md,
+    marginBottom: spacing.xs,
+  },
+  selectedTimeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.primarySubtle,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  selectedTimeBadgeText: {
+    ...typography.caption,
+    fontWeight: '800',
+    color: colors.primaryDark,
+  },
+  unselectedTimeHint: {
+    ...typography.caption,
+    color: colors.textMuted,
+    fontStyle: 'italic',
+  },
+  customTimeBox: {
+    marginTop: spacing.sm,
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  customTimeLabel: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginBottom: 6,
+    fontWeight: '600',
+  },
+  customTimeInput: {
+    backgroundColor: colors.surfaceSubtle,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: spacing.md,
+    height: 40,
+    ...typography.body,
+    fontSize: 14,
+    color: colors.textPrimary,
   },
   timeScroll: {
     gap: spacing.sm,

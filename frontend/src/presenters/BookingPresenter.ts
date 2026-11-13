@@ -52,6 +52,11 @@ export class BookingPresenter {
       );
       return;
     }
+    const cleanTime = (bookingData.reservationTime || '').trim();
+    if (!cleanTime) {
+      this.view.showError('Vui lòng chọn hoặc tự nhập khung giờ bạn muốn đến');
+      return;
+    }
     if (!bookingData.selectedTable) {
       this.view.showError('Vui lòng chọn bàn bạn muốn ngồi');
       return;
