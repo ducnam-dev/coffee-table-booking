@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,29 @@ import { clearCart } from '../../store/slices/menuSlice';
 import { setTables } from '../../store/slices/tablesSlice';
 import { TableModel } from '../../models/TableModel';
 import { CoffeeTable, Reservation } from '../../types';
+
+export const getLocalDateString = (d: Date = new Date()): string => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const getUpcomingDays = (daysCount = 14) => {
+  const dates = [];
+  const dayNames = ['CN', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+  for (let i = 0; i < daysCount; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    const dateStr = getLocalDateString(d);
+    let label = '';
+    if (i === 0) label = 'Hôm nay';
+    else if (i === 1) label = 'Ngày mai';
+    else label = `${dayNames[d.getDay()]}, ${d.getDate()}/${d.getMonth() + 1}`;
+    dates.push({ dateStr, label, day: d.getDate(), month: d.getMonth() + 1 });
+  }
+  return dates;
+};
 
 interface BookingViewProps {
   route?: { params?: { preselectedTable?: CoffeeTable } };
@@ -62,10 +85,32 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
     }
   };
   const [guestCount, setGuestCount] = useState(2);
-  const [reservationDate, setReservationDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  });
+  const todayStr = useMemo(() => getLocalDateString(), []);
+  const upcomingDays = useMemo(() => getUpcomingDays(14), []);
+  const [reservationDate, setReservationDate] = useState(() => getLocalDateString());
+  const [dateError, setDateError] = useState('');
+
+  const handleDateSelect = (dateStr: string) => {
+    if (dateStr < todayStr) {
+      setDateError('Không thể chọn ngày trong quá khứ! Vui lòng chọn từ hôm nay trở đi.');
+      return;
+    }
+    setDateError('');
+    setReservationDate(dateStr);
+  };
+
+  const handleDateTextChange = (text: string) => {
+    setReservationDate(text);
+    if (text.length === 10) {
+      if (text < todayStr) {
+        setDateError('Không thể chọn ngày trong quá khứ! Vui lòng chọn từ hôm nay trở đi.');
+      } else {
+        setDateError('');
+      }
+    } else {
+      setDateError('');
+    }
+  };
   const [reservationTime, setReservationTime] = useState('');
   const [selectedTable, setSelectedTable] = useState<CoffeeTable | null>(
     route?.params?.preselectedTable || null
@@ -184,14 +229,57 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
               </View>
             </View>
 
-            <Text style={[styles.label, { marginTop: spacing.md }]}>Ngày đặt:</Text>
-            <TextInput
-              style={styles.input}
-              value={reservationDate}
-              onChangeText={setReservationDate}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={colors.textMuted}
-            />
+            <View style={styles.dateHeaderRow}>
+              <Text style={styles.label}>Ngày đặt bàn: *</Text>
+              <View style={styles.selectedDateBadge}>
+                <Ionicons name="calendar" size={13} color={colors.primaryDark} />
+                <Text style={styles.selectedDateBadgeText}>{reservationDate}</Text>
+              </View>
+            </View>
+
+            {/* Quick date selector chips (realtime từ hôm nay trở đi) */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              nestedScrollEnabled
+              contentContainerStyle={styles.dateScroll}
+            >
+              {upcomingDays.map((item) => {
+                const isSelected = reservationDate === item.dateStr;
+                return (
+                  <AnimatedScaleButton
+                    key={item.dateStr}
+                    onPress={() => handleDateSelect(item.dateStr)}
+                    style={[styles.dateChip, isSelected && styles.dateChipActive]}
+                  >
+                    <Text style={[styles.dateChipDay, isSelected && styles.dateChipDayActive]}>
+                      {item.label}
+                    </Text>
+                    <Text style={[styles.dateChipDate, isSelected && styles.dateChipDateActive]}>
+                      {item.day}/{item.month}
+                    </Text>
+                  </AnimatedScaleButton>
+                );
+              })}
+            </ScrollView>
+
+            <View style={styles.customDateRow}>
+              <Text style={styles.customTimeLabel}>Hoặc nhập ngày khác (YYYY-MM-DD):</Text>
+              <TextInput
+                style={[styles.customTimeInput, dateError ? styles.inputError : null]}
+                value={reservationDate}
+                onChangeText={handleDateTextChange}
+                placeholder="YYYY-MM-DD"
+                placeholderTextColor={colors.textMuted}
+                maxLength={10}
+              />
+              {dateError ? (
+                <Text style={styles.errorText}>{dateError}</Text>
+              ) : (
+                <Text style={styles.phoneHint}>Chỉ nhận đặt từ hôm nay ({todayStr}) trở đi</Text>
+              )}
+            </View>
 
             <View style={styles.timeHeaderRow}>
               <Text style={styles.label}>Khung giờ đến: *</Text>
@@ -533,6 +621,70 @@ const styles = StyleSheet.create({
     ...typography.bodyLarge,
     fontWeight: '700',
     paddingHorizontal: spacing.md,
+  },
+  dateHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: spacing.md,
+    marginBottom: spacing.xs,
+  },
+  selectedDateBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.primarySubtle,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  selectedDateBadgeText: {
+    ...typography.caption,
+    fontWeight: '800',
+    color: colors.primaryDark,
+  },
+  dateScroll: {
+    gap: spacing.sm,
+    paddingVertical: spacing.xs,
+    paddingRight: spacing.xl,
+  },
+  dateChip: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: 6,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceSubtle,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 80,
+  },
+  dateChipActive: {
+    backgroundColor: colors.espresso,
+    borderColor: colors.espresso,
+  },
+  dateChipDay: {
+    ...typography.caption,
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.textPrimary,
+  },
+  dateChipDayActive: {
+    color: colors.textInverse,
+  },
+  dateChipDate: {
+    ...typography.caption,
+    fontSize: 10,
+    color: colors.textMuted,
+    marginTop: 2,
+  },
+  dateChipDateActive: {
+    color: colors.primaryLight,
+  },
+  customDateRow: {
+    marginTop: spacing.sm,
   },
   timeHeaderRow: {
     flexDirection: 'row',

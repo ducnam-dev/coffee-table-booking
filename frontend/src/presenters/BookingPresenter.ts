@@ -52,6 +52,24 @@ export class BookingPresenter {
       );
       return;
     }
+    const todayStr = (() => {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    })();
+
+    const cleanDate = (bookingData.reservationDate || '').trim();
+    if (!cleanDate) {
+      this.view.showError('Vui lòng chọn ngày đặt bàn');
+      return;
+    }
+    if (cleanDate < todayStr) {
+      this.view.showError(`Không thể chọn ngày trong quá khứ! Vui lòng chọn từ ngày hôm nay (${todayStr}) trở đi.`);
+      return;
+    }
+
     const cleanTime = (bookingData.reservationTime || '').trim();
     if (!cleanTime) {
       this.view.showError('Vui lòng chọn hoặc tự nhập khung giờ bạn muốn đến');
