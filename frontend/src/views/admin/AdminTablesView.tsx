@@ -78,11 +78,11 @@ export const AdminTablesView: React.FC<{ navigation: any }> = ({ navigation }) =
                 <View style={styles.rowBetween}>
                   <View style={styles.leftRow}>
                     <View style={styles.tableNumBox}>
-                      <Text style={styles.tableNumText}>{t.tableNumber}</Text>
+                      <Text style={styles.tableNumText}>{t.tableNumber || `B0${t.id}`}</Text>
                     </View>
                     <View>
-                      <Text style={styles.tableArea}>Khu vực: {t.area}</Text>
-                      <Text style={styles.tableCap}>Sức chứa: {t.capacity} chỗ</Text>
+                      <Text style={styles.tableArea}>{t.name || `Khu vực: ${t.area}`}</Text>
+                      <Text style={styles.tableCap}>Sức chứa: {t.capacity || t.seats || 4} chỗ</Text>
                     </View>
                   </View>
 

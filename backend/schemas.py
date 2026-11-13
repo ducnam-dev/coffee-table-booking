@@ -38,6 +38,12 @@ class CoffeeTableBase(BaseModel):
     isNearWindow: bool = False
     isOutdoor: bool = False
     hasSocket: bool = True
+    tableNumber: Optional[str] = None
+    capacity: Optional[int] = None
+    area: Optional[str] = None
+    description: Optional[str] = None
+    hasPowerOutlet: Optional[bool] = None
+    isWindowView: Optional[bool] = None
 
 class CoffeeTableCreate(CoffeeTableBase):
     pass

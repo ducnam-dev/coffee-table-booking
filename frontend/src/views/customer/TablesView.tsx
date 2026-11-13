@@ -186,18 +186,26 @@ export const TablesView: React.FC<TablesViewProps> = ({ navigation }) => {
                     >
                       <View style={styles.cardTop}>
                         <View style={styles.tableNumberWrap}>
-                          <Text style={styles.tableNumber}>{table.tableNumber}</Text>
+                          <Text style={styles.tableNumber}>
+                            {table.tableNumber || `B0${table.id}`}
+                          </Text>
                         </View>
                         <Badge label={statusBadge.label} variant={statusBadge.variant} />
                       </View>
 
+                      <View style={styles.tableNameWrap}>
+                        <Text style={styles.tableName} numberOfLines={1}>
+                          {table.name || `Bàn ${table.tableNumber || `0${table.id}`}`}
+                        </Text>
+                      </View>
+
                       <View style={styles.capacityRow}>
                         <Ionicons name="people-outline" size={16} color={colors.textSecondary} />
-                        <Text style={styles.capacityText}>Sức chứa: {table.capacity} người</Text>
+                        <Text style={styles.capacityText}>Sức chứa: {table.capacity || table.seats || 4} người</Text>
                       </View>
 
                       <Text style={styles.description} numberOfLines={2}>
-                        {table.description || 'Khu vực yên tĩnh, thoáng mát'}
+                        {table.description || table.name || 'Khu vực yên tĩnh, thoáng mát'}
                       </Text>
 
                       <View style={styles.perksRow}>
@@ -339,17 +347,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tableNumberWrap: {
-    width: 38,
+    minWidth: 44,
     height: 38,
+    paddingHorizontal: 8,
     borderRadius: radius.md,
     backgroundColor: colors.espresso,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadows.soft,
   },
   tableNumber: {
-    ...typography.h3,
+    fontSize: 14,
     color: colors.textInverse,
     fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  tableNameWrap: {
+    marginTop: spacing.xs,
+    marginBottom: 2,
+  },
+  tableName: {
+    ...typography.bodyLarge,
+    fontWeight: '700',
+    color: colors.textPrimary,
   },
   capacityRow: {
     flexDirection: 'row',

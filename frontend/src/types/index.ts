@@ -17,12 +17,18 @@ export type TableArea = 'INDOOR' | 'OUTDOOR' | 'BALCONY' | 'VIP';
 export interface CoffeeTable {
   id: number;
   tableNumber: string;
+  name?: string;
   capacity: number;
+  seats?: number;
   area: TableArea;
+  type?: string;
   status: TableStatus;
   description?: string;
   hasPowerOutlet?: boolean;
+  hasSocket?: boolean;
   isWindowView?: boolean;
+  isNearWindow?: boolean;
+  isOutdoor?: boolean;
 }
 
 export type MenuCategory = 'COFFEE' | 'TEA' | 'FREEZE' | 'PASTRY' | 'SPECIAL';

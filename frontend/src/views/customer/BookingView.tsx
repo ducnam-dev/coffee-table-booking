@@ -199,11 +199,11 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
                 >
                   <View style={[styles.tableNumberBox, isSelected && styles.tableNumberBoxActive]}>
                     <Text style={[styles.tableNumberBoxText, isSelected && styles.tableNumberBoxTextActive]}>
-                      {t.tableNumber}
+                      {t.tableNumber || `B0${t.id}`}
                     </Text>
                   </View>
-                  <Text style={styles.tableChoiceCap}>{t.capacity} chỗ</Text>
-                  <Text style={styles.tableChoiceArea}>{t.area}</Text>
+                  <Text style={styles.tableChoiceCap}>{t.capacity || (t as any).seats || 4} chỗ</Text>
+                  <Text style={styles.tableChoiceArea}>{t.name || t.area}</Text>
                 </AnimatedScaleButton>
               );
             })}

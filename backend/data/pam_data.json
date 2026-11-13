@@ -25,62 +25,98 @@
     {
       "id": 1,
       "name": "Bàn 01 (Cửa sổ)",
+      "tableNumber": "B01",
+      "capacity": 2,
       "seats": 2,
       "type": "Cặp đôi",
-      "status": "AVAILABLE",
+      "area": "INDOOR",
+      "status": "OCCUPIED",
+      "description": "Bàn cạnh cửa sổ, không gian lãng mạn cho 2 người",
       "isNearWindow": true,
       "isOutdoor": false,
-      "hasSocket": true
+      "hasSocket": true,
+      "hasPowerOutlet": true,
+      "isWindowView": true
     },
     {
       "id": 2,
       "name": "Bàn 02 (Sân vườn)",
+      "tableNumber": "B02",
+      "capacity": 4,
       "seats": 4,
       "type": "Sân vườn",
+      "area": "OUTDOOR",
       "status": "RESERVED",
+      "description": "Bàn sân vườn xanh mát dưới tán cây tự nhiên",
       "isNearWindow": false,
       "isOutdoor": true,
-      "hasSocket": false
+      "hasSocket": false,
+      "hasPowerOutlet": false,
+      "isWindowView": false
     },
     {
       "id": 3,
       "name": "Bàn 03 (Phòng lạnh)",
+      "tableNumber": "B03",
+      "capacity": 6,
       "seats": 6,
       "type": "Phòng lạnh",
+      "area": "INDOOR",
       "status": "RESERVED",
+      "description": "Bàn dài nhóm họp máy lạnh, yên tĩnh và tiện làm việc",
       "isNearWindow": false,
       "isOutdoor": false,
-      "hasSocket": true
+      "hasSocket": true,
+      "hasPowerOutlet": true,
+      "isWindowView": false
     },
     {
       "id": 4,
       "name": "Bàn 04 (Gác lửng)",
+      "tableNumber": "B04",
+      "capacity": 2,
       "seats": 2,
       "type": "Gác lửng",
+      "area": "BALCONY",
       "status": "AVAILABLE",
+      "description": "Gác lửng view toàn cảnh quán, góc riêng tư nhẹ nhàng",
       "isNearWindow": true,
       "isOutdoor": false,
-      "hasSocket": true
+      "hasSocket": true,
+      "hasPowerOutlet": true,
+      "isWindowView": true
     },
     {
       "id": 5,
       "name": "Bàn 05 (Sân vườn VIP)",
+      "tableNumber": "B05",
+      "capacity": 8,
       "seats": 8,
-      "type": "Sân vườn",
+      "type": "VIP",
+      "area": "VIP",
       "status": "AVAILABLE",
+      "description": "Không gian VIP sang trọng cho gia đình và nhóm bạn lớn",
       "isNearWindow": false,
       "isOutdoor": true,
-      "hasSocket": true
+      "hasSocket": true,
+      "hasPowerOutlet": true,
+      "isWindowView": false
     },
     {
       "id": 6,
       "name": "Bàn 06 (Cửa sổ tầng 2)",
+      "tableNumber": "B06",
+      "capacity": 4,
       "seats": 4,
       "type": "Cặp đôi",
+      "area": "BALCONY",
       "status": "OCCUPIED",
+      "description": "Cửa sổ tầng 2 view phố đón gió trời, ánh sáng tự nhiên",
       "isNearWindow": true,
       "isOutdoor": false,
-      "hasSocket": true
+      "hasSocket": true,
+      "hasPowerOutlet": true,
+      "isWindowView": true
     }
   ],
   "menu": [
@@ -183,6 +219,48 @@
   ],
   "reservations": [
     {
+      "id": 1794594179512,
+      "customerName": "Nguyễn Khách Hàng",
+      "customerPhone": "",
+      "customerEmail": "",
+      "userId": 2,
+      "coffeeTable": {},
+      "reservationTime": "09:00",
+      "timeDisplay": "Hôm nay",
+      "guestNumber": 2,
+      "note": "",
+      "status": "PENDING",
+      "orderItems": []
+    },
+    {
+      "id": 1794594178385,
+      "customerName": "Nguyễn Khách Hàng",
+      "customerPhone": "",
+      "customerEmail": "",
+      "userId": 2,
+      "coffeeTable": {},
+      "reservationTime": "09:00",
+      "timeDisplay": "Hôm nay",
+      "guestNumber": 2,
+      "note": "",
+      "status": "PENDING",
+      "orderItems": []
+    },
+    {
+      "id": 1794594177374,
+      "customerName": "Nguyễn Khách Hàng",
+      "customerPhone": "",
+      "customerEmail": "",
+      "userId": 2,
+      "coffeeTable": {},
+      "reservationTime": "09:00",
+      "timeDisplay": "Hôm nay",
+      "guestNumber": 2,
+      "note": "",
+      "status": "PENDING",
+      "orderItems": []
+    },
+    {
       "id": 1794237095587,
       "customerName": "Nguyễn Văn Khách",
       "customerPhone": "",
@@ -207,7 +285,7 @@
       "timeDisplay": "Hôm nay",
       "guestNumber": 2,
       "note": "",
-      "status": "PENDING",
+      "status": "CANCELLED",
       "orderItems": []
     },
     {
