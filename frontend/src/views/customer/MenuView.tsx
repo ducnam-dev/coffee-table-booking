@@ -6,6 +6,7 @@ import {
   ScrollView,
   StyleSheet,
   Image,
+  BackHandler,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -78,7 +79,29 @@ export const MenuView: React.FC<MenuViewProps> = ({ route, navigation }) => {
   });
 
   const insets = useSafeAreaInsets();
-  const cartTotalItems = cart.reduce((sum, i) => sum + i.quantity, 0);
+
+  const handleBack = () => {
+    // Luôn ưu tiên quay về màn hình Đặt Bàn nếu đang trong luồng đặt hoặc giỏ có món
+    if (route?.params?.fromBooking || cart.length > 0) {
+      navigation.navigate('CustomerTabs', { screen: 'Booking' });
+    } else if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('CustomerTabs', { screen: 'Booking' });
+    }
+  };
+
+  useEffect(() => {
+    const onBackPress = () => {
+      if (route?.params?.fromBooking || cart.length > 0) {
+        navigation.navigate('CustomerTabs', { screen: 'Booking' });
+        return true;
+      }
+      return false;
+    };
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => sub.remove();
+  }, [route?.params?.fromBooking, cart.length, navigation]);
 
   return (
     <View style={styles.container}>
@@ -95,13 +118,7 @@ export const MenuView: React.FC<MenuViewProps> = ({ route, navigation }) => {
         <View style={styles.headerTopRow}>
           <View style={styles.headerLeftGroup}>
             <AnimatedScaleButton
-              onPress={() => {
-                if (navigation.canGoBack()) {
-                  navigation.goBack();
-                } else {
-                  navigation.navigate('CustomerTabs', { screen: 'Booking' });
-                }
-              }}
+              onPress={handleBack}
               style={styles.backBtn}
             >
               <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
@@ -255,30 +272,6 @@ export const MenuView: React.FC<MenuViewProps> = ({ route, navigation }) => {
           </View>
         )}
       </ScrollView>
-
-      {/* Floating Cart Button */}
-      {cartTotalItems > 0 && (
-        <FadeInView style={styles.cartBarWrap}>
-          <AnimatedScaleButton
-            onPress={() => navigation.navigate('CustomerTabs', { screen: 'Booking' })}
-            style={styles.cartBarBtn}
-          >
-            <View style={styles.cartBarLeft}>
-              <View style={styles.cartBadge}>
-                <Text style={styles.cartBadgeText}>{cartTotalItems}</Text>
-              </View>
-              <View>
-                <Text style={styles.cartBarTitle}>Đã chọn {cartTotalItems} món nước</Text>
-                <Text style={styles.cartBarSub}>Chạm để quay lại màn hình Đặt Bàn</Text>
-              </View>
-            </View>
-            <View style={styles.cartBarAction}>
-              <Text style={styles.cartBarActionText}>Về Đặt Bàn</Text>
-              <Ionicons name="arrow-forward" size={16} color={colors.textInverse} />
-            </View>
-          </AnimatedScaleButton>
-        </FadeInView>
-      )}
     </View>
   );
 };
@@ -435,67 +428,6 @@ const styles = StyleSheet.create({
     ...typography.bodySmall,
     color: colors.textMuted,
     marginTop: 4,
-  },
-  cartBarWrap: {
-    position: 'absolute',
-    bottom: spacing.lg,
-    left: spacing.lg,
-    right: spacing.lg,
-    ...shadows.prominent,
-  },
-  cartBarBtn: {
-    backgroundColor: colors.espresso,
-    height: 56,
-    borderRadius: radius.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-    ...shadows.medium,
-  },
-  cartBarLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  cartBadge: {
-    backgroundColor: colors.primary,
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cartBadgeText: {
-    ...typography.caption,
-    color: colors.textInverse,
-    fontWeight: '800',
-  },
-  cartBarTitle: {
-    ...typography.body,
-    fontWeight: '700',
-    color: colors.textInverse,
-  },
-  cartBarSub: {
-    ...typography.caption,
-    fontSize: 11,
-    color: colors.primaryLight,
-  },
-  cartBarAction: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: colors.primary,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-    borderRadius: radius.md,
-  },
-  cartBarActionText: {
-    ...typography.caption,
-    fontWeight: '700',
-    color: colors.textInverse,
   },
 });
 
