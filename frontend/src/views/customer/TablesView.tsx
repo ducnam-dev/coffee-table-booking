@@ -5,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -24,7 +25,7 @@ interface TablesViewProps {
 }
 
 const AREAS: { key: TableArea | 'ALL'; label: string }[] = [
-  { key: 'ALL', label: 'Tất cả vị trí' },
+  { key: 'ALL', label: 'Tất cả' },
   { key: 'INDOOR', label: 'Trong nhà' },
   { key: 'BALCONY', label: 'Ban công' },
   { key: 'OUTDOOR', label: 'Sân vườn' },
@@ -106,8 +107,26 @@ export const TablesView: React.FC<TablesViewProps> = ({ navigation }) => {
       </View>
 
       {/* Area Selector Filter Tabs */}
-      <View style={[styles.filterBar, { paddingHorizontal: responsive.horizontalPadding }]}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
+      <View style={styles.filterBar}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          nestedScrollEnabled
+          {...(Platform.OS === 'web'
+            ? {
+                onWheel: (e: any) => {
+                  if (e.deltaY !== 0 && Math.abs(e.deltaX) < Math.abs(e.deltaY)) {
+                    e.currentTarget.scrollLeft += e.deltaY;
+                  }
+                },
+              }
+            : {})}
+          contentContainerStyle={[
+            styles.filterScroll,
+            { paddingHorizontal: responsive.horizontalPadding },
+          ]}
+        >
           {AREAS.map((a) => {
             const isActive = selectedArea === a.key;
             return (
@@ -269,7 +288,10 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   filterScroll: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.sm,
+    paddingRight: spacing.xxl,
   },
   areaChip: {
     paddingHorizontal: spacing.md,

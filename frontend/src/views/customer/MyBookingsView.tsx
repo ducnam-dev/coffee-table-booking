@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -100,7 +101,22 @@ export const MyBookingsView: React.FC<MyBookingsViewProps> = ({ navigation }) =>
           <Text style={styles.title} numberOfLines={1}>Lịch Sử Đặt Bàn</Text>
           <View style={{ width: 44 }} />
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          nestedScrollEnabled
+          {...(Platform.OS === 'web'
+            ? {
+                onWheel: (e: any) => {
+                  if (e.deltaY !== 0 && Math.abs(e.deltaX) < Math.abs(e.deltaY)) {
+                    e.currentTarget.scrollLeft += e.deltaY;
+                  }
+                },
+              }
+            : {})}
+          contentContainerStyle={styles.tabsRow}
+        >
           {TABS.map((tab) => {
             const isActive = selectedStatus === tab.key;
             return (
@@ -248,8 +264,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   tabsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.sm,
     paddingVertical: spacing.xs,
+    paddingRight: spacing.xl,
   },
   tabChip: {
     paddingHorizontal: spacing.md,

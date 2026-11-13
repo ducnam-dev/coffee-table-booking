@@ -6,6 +6,7 @@ import {
   ViewStyle,
   StyleProp,
   GestureResponderEvent,
+  Platform,
 } from 'react-native';
 import { touchTarget } from '../theme/designTokens';
 
@@ -30,7 +31,7 @@ export const AnimatedScaleButton: React.FC<AnimatedScaleButtonProps> = ({
     if (disabled) return;
     Animated.spring(scale, {
       toValue: scaleTo,
-      useNativeDriver: true,
+      useNativeDriver: Platform.OS !== 'web',
       speed: 30,
       bounciness: 4,
     }).start();
@@ -39,7 +40,7 @@ export const AnimatedScaleButton: React.FC<AnimatedScaleButtonProps> = ({
   const handlePressOut = () => {
     Animated.spring(scale, {
       toValue: 1,
-      useNativeDriver: true,
+      useNativeDriver: Platform.OS !== 'web',
       speed: 25,
       bounciness: 4,
     }).start();

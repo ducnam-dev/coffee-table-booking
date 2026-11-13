@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
@@ -160,7 +161,22 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
             />
 
             <Text style={[styles.label, { marginTop: spacing.md }]}>Khung giờ đến:</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.timeScroll}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              nestedScrollEnabled
+              {...(Platform.OS === 'web'
+                ? {
+                    onWheel: (e: any) => {
+                      if (e.deltaY !== 0 && Math.abs(e.deltaX) < Math.abs(e.deltaY)) {
+                        e.currentTarget.scrollLeft += e.deltaY;
+                      }
+                    },
+                  }
+                : {})}
+              contentContainerStyle={styles.timeScroll}
+            >
               {TIME_SLOTS.map((time) => {
                 const isSelected = reservationTime === time;
                 return (
@@ -188,7 +204,22 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
             </AnimatedScaleButton>
           </View>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tableScroll}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            nestedScrollEnabled
+            {...(Platform.OS === 'web'
+              ? {
+                  onWheel: (e: any) => {
+                    if (e.deltaY !== 0 && Math.abs(e.deltaX) < Math.abs(e.deltaY)) {
+                      e.currentTarget.scrollLeft += e.deltaY;
+                    }
+                  },
+                }
+              : {})}
+            contentContainerStyle={styles.tableScroll}
+          >
             {availableTables.map((t) => {
               const isSelected = selectedTable?.id === t.id;
               return (
@@ -420,6 +451,7 @@ const styles = StyleSheet.create({
   timeScroll: {
     gap: spacing.sm,
     paddingVertical: spacing.xs,
+    paddingRight: spacing.xl,
   },
   timeChip: {
     paddingHorizontal: spacing.md,
@@ -447,6 +479,7 @@ const styles = StyleSheet.create({
   tableScroll: {
     gap: spacing.sm,
     paddingVertical: spacing.xs,
+    paddingRight: spacing.xl,
   },
   tableChoiceCard: {
     width: 90,
