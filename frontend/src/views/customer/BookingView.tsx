@@ -19,6 +19,8 @@ import { BookingPresenter, BookingViewInterface } from '../../presenters/Booking
 import { useAppDispatch, useAppSelector } from '../../store';
 import { addReservation, clearCurrentBooking } from '../../store/slices/bookingsSlice';
 import { clearCart } from '../../store/slices/menuSlice';
+import { setTables } from '../../store/slices/tablesSlice';
+import { TableModel } from '../../models/TableModel';
 import { CoffeeTable, Reservation } from '../../types';
 
 interface BookingViewProps {
@@ -38,8 +40,10 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
   const tables = useAppSelector((state) => state.tables.tables);
   const cart = useAppSelector((state) => state.menu.cart);
 
-  const [customerName, setCustomerName] = useState(user?.fullName || '');
-  const [phone, setPhone] = useState(user?.phone || '');
+  const [customerName, setCustomerName] = useState(
+    user?.fullName || user?.username || 'Nguyễn Khách Hàng'
+  );
+  const [phone, setPhone] = useState(user?.phone || '0988776655');
   const [guestCount, setGuestCount] = useState(2);
   const [reservationDate, setReservationDate] = useState(() => {
     const today = new Date();
@@ -51,6 +55,18 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
   );
   const [specialRequests, setSpecialRequests] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (tables.length === 0) {
+      TableModel.getAllTables().then((data) => {
+        dispatch(setTables(data));
+        if (!selectedTable) {
+          const avail = data.find((t) => t.status === 'AVAILABLE');
+          if (avail) setSelectedTable(avail);
+        }
+      });
+    }
+  }, []);
 
   useEffect(() => {
     if (route?.params?.preselectedTable) {
@@ -68,20 +84,7 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
       dispatch(addReservation(reservation));
       dispatch(clearCart());
       dispatch(clearCurrentBooking());
-      Alert.alert(
-        'Đặt Bàn Thành Công! 🎉',
-        `Mã vé: ${reservation.qrCode}\nBàn: ${reservation.tableNumber}\nNgày: ${reservation.reservationDate} lúc ${reservation.reservationTime}`,
-        [
-          {
-            text: 'Xem Vé Đặt Chỗ',
-            onPress: () => navigation.navigate('BookingDetail', { booking: reservation }),
-          },
-          {
-            text: 'Về Trang Chủ',
-            onPress: () => navigation.navigate('Home'),
-          },
-        ]
-      );
+      navigation.navigate('BookingDetail', { booking: reservation });
     },
   };
 

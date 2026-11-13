@@ -38,11 +38,41 @@ let MOCK_RESERVATIONS: Reservation[] = [
   },
 ];
 
+export function normalizeReservation(raw: any, fallback?: Partial<Reservation>): Reservation {
+  const tableId = raw.tableId || raw.coffeeTable?.id || fallback?.tableId || 1;
+  let tableNumber = raw.tableNumber || raw.coffeeTable?.name || fallback?.tableNumber;
+  if (!tableNumber) {
+    tableNumber = `B0${tableId}`;
+  }
+
+  return {
+    id: raw.id || Date.now(),
+    customerName: raw.customerName || fallback?.customerName || 'Khách đặt',
+    phone: raw.phone || raw.customerPhone || fallback?.phone || '',
+    email: raw.email || raw.customerEmail || fallback?.email || '',
+    tableId,
+    tableNumber,
+    reservationDate: raw.reservationDate || fallback?.reservationDate || new Date().toISOString().split('T')[0],
+    reservationTime: raw.reservationTime || fallback?.reservationTime || '09:00',
+    guestCount: raw.guestCount || raw.guestNumber || fallback?.guestCount || 2,
+    orderItems: raw.orderItems || fallback?.orderItems || [],
+    totalAmount: raw.totalAmount || fallback?.totalAmount || 0,
+    depositAmount: raw.depositAmount || fallback?.depositAmount || 50000,
+    status: raw.status || 'PENDING',
+    specialRequests: raw.specialRequests || raw.note || fallback?.specialRequests || '',
+    qrCode: raw.qrCode || `PAM-RES-${(raw.id || Date.now()).toString().slice(-4)}`,
+    createdAt: raw.createdAt || new Date().toLocaleString(),
+  };
+}
+
 export class ReservationModel {
   static async getAllReservations(): Promise<Reservation[]> {
     try {
       const res = await axiosClient.get('/reservations');
-      return res.data;
+      if (Array.isArray(res.data)) {
+        return res.data.map((r: any) => normalizeReservation(r));
+      }
+      return MOCK_RESERVATIONS;
     } catch {
       return MOCK_RESERVATIONS;
     }
@@ -51,26 +81,11 @@ export class ReservationModel {
   static async createReservation(data: Partial<Reservation>): Promise<Reservation> {
     try {
       const res = await axiosClient.post('/reservations', data);
-      return res.data;
+      const normalized = normalizeReservation(res.data, data);
+      MOCK_RESERVATIONS = [normalized, ...MOCK_RESERVATIONS];
+      return normalized;
     } catch {
-      const newRes: Reservation = {
-        id: Date.now(),
-        customerName: data.customerName || 'Khách đặt',
-        phone: data.phone || '0900000000',
-        email: data.email || '',
-        tableId: data.tableId || 1,
-        tableNumber: data.tableNumber || 'B01',
-        reservationDate: data.reservationDate || new Date().toISOString().split('T')[0],
-        reservationTime: data.reservationTime || '10:00',
-        guestCount: data.guestCount || 2,
-        orderItems: data.orderItems || [],
-        totalAmount: data.totalAmount || 50000,
-        depositAmount: data.depositAmount || 50000,
-        status: 'PENDING',
-        specialRequests: data.specialRequests || '',
-        qrCode: `PAM-RES-${Date.now().toString().slice(-4)}`,
-        createdAt: new Date().toLocaleString(),
-      };
+      const newRes = normalizeReservation(data, data);
       MOCK_RESERVATIONS = [newRes, ...MOCK_RESERVATIONS];
       return newRes;
     }
@@ -79,7 +94,7 @@ export class ReservationModel {
   static async updateStatus(reservationId: number, status: ReservationStatus): Promise<Reservation> {
     try {
       const res = await axiosClient.put(`/reservations/${reservationId}/status`, { status });
-      return res.data;
+      return normalizeReservation(res.data);
     } catch {
       const found = MOCK_RESERVATIONS.find((r) => r.id === reservationId);
       if (found) found.status = status;

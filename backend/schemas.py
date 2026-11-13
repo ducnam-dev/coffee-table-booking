@@ -73,15 +73,26 @@ class OrderItem(BaseModel):
 class ReservationBase(BaseModel):
     customerName: Optional[str] = None
     customerPhone: Optional[str] = None
+    phone: Optional[str] = None
     customerEmail: Optional[str] = None
+    email: Optional[str] = None
     userId: Optional[int] = None
     coffeeTable: Optional[dict] = None
+    tableId: Optional[int] = None
+    tableNumber: Optional[str] = None
+    reservationDate: Optional[str] = None
     reservationTime: Optional[str] = None
     timeDisplay: Optional[str] = None
-    guestNumber: int = 2
+    guestNumber: Optional[int] = 2
+    guestCount: Optional[int] = 2
     note: Optional[str] = ""
+    specialRequests: Optional[str] = ""
     status: str = "PENDING"  # PENDING, CONFIRMED, CANCELLED
     orderItems: Optional[List[dict]] = []
+    totalAmount: Optional[int] = 0
+    depositAmount: Optional[int] = 50000
+    qrCode: Optional[str] = None
+    createdAt: Optional[str] = None
 
 class ReservationCreate(ReservationBase):
     pass

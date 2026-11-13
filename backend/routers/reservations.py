@@ -25,30 +25,52 @@ def create_reservation(res_data: ReservationCreate):
     tables = db.data.get("tables", [])
 
     new_id = int(time.time() * 1000)
-    new_reservation = {
-        "id": new_id,
-        "customerName": res_data.customerName or "Khách hàng",
-        "customerPhone": res_data.customerPhone or "",
-        "customerEmail": res_data.customerEmail or "",
-        "userId": res_data.userId or 2,
-        "coffeeTable": res_data.coffeeTable or {},
-        "reservationTime": res_data.reservationTime,
-        "timeDisplay": res_data.timeDisplay or "Hôm nay",
-        "guestNumber": res_data.guestNumber,
-        "note": res_data.note or "",
-        "status": res_data.status or "PENDING",
-        "orderItems": res_data.orderItems or []
-    }
-    reservations.insert(0, new_reservation)
+    customer_phone = res_data.phone or res_data.customerPhone or ""
+    customer_email = res_data.email or res_data.customerEmail or ""
+    guest_count = res_data.guestCount or res_data.guestNumber or 2
+    note = res_data.specialRequests or res_data.note or ""
+    table_id = res_data.tableId or (res_data.coffeeTable.get("id") if res_data.coffeeTable else None)
 
     # Update table status to RESERVED if table selected
-    table_id = res_data.coffeeTable.get("id") if res_data.coffeeTable else None
+    matched_table = None
     if table_id:
         for t in tables:
             if t["id"] == table_id:
+                matched_table = t
                 t["status"] = "RESERVED"
                 break
 
+    table_num = res_data.tableNumber or (matched_table.get("tableNumber") if matched_table else (f"B0{table_id}" if table_id else "B01"))
+    today_str = time.strftime("%Y-%m-%d")
+    res_date = res_data.reservationDate or today_str
+    qr_code = res_data.qrCode or f"PAM-RES-{new_id % 10000:04d}"
+
+    new_reservation = {
+        "id": new_id,
+        "customerName": res_data.customerName or "Khách hàng",
+        "customerPhone": customer_phone,
+        "phone": customer_phone,
+        "customerEmail": customer_email,
+        "email": customer_email,
+        "userId": res_data.userId or 2,
+        "tableId": table_id or 1,
+        "tableNumber": table_num,
+        "coffeeTable": matched_table or {"id": table_id, "name": f"Bàn {table_num}"},
+        "reservationDate": res_date,
+        "reservationTime": res_data.reservationTime or "09:00",
+        "timeDisplay": f"{res_data.reservationTime or '09:00'} - {res_date}",
+        "guestNumber": guest_count,
+        "guestCount": guest_count,
+        "note": note,
+        "specialRequests": note,
+        "status": res_data.status or "PENDING",
+        "orderItems": res_data.orderItems or [],
+        "totalAmount": res_data.totalAmount or 0,
+        "depositAmount": res_data.depositAmount or 50000,
+        "qrCode": qr_code,
+        "createdAt": time.strftime("%Y-%m-%d %H:%M")
+    }
+    reservations.insert(0, new_reservation)
     db.save()
     return new_reservation
 

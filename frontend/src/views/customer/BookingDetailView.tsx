@@ -78,33 +78,33 @@ export const BookingDetailView: React.FC<BookingDetailViewProps> = ({ route, nav
             <View style={styles.infoGrid}>
               <View style={styles.infoCol}>
                 <Text style={styles.infoLabel}>BÀN SỐ</Text>
-                <Text style={styles.infoValueLarge}>{booking.tableNumber}</Text>
+                <Text style={styles.infoValueLarge}>{booking.tableNumber || (booking as any).coffeeTable?.name || 'B01'}</Text>
               </View>
               <View style={styles.infoCol}>
                 <Text style={styles.infoLabel}>SỐ KHÁCH</Text>
-                <Text style={styles.infoValueLarge}>{booking.guestCount} người</Text>
+                <Text style={styles.infoValueLarge}>{booking.guestCount || (booking as any).guestNumber || 2} người</Text>
               </View>
             </View>
 
             <View style={styles.infoGrid}>
               <View style={styles.infoCol}>
                 <Text style={styles.infoLabel}>NGÀY HẸN</Text>
-                <Text style={styles.infoValue}>{booking.reservationDate}</Text>
+                <Text style={styles.infoValue}>{booking.reservationDate || 'Hôm nay'}</Text>
               </View>
               <View style={styles.infoCol}>
                 <Text style={styles.infoLabel}>GIỜ ĐẾN</Text>
-                <Text style={styles.infoValue}>{booking.reservationTime}</Text>
+                <Text style={styles.infoValue}>{booking.reservationTime || '09:00'}</Text>
               </View>
             </View>
 
             <View style={styles.infoGrid}>
               <View style={styles.infoCol}>
                 <Text style={styles.infoLabel}>NGƯỜI ĐẶT</Text>
-                <Text style={styles.infoValue}>{booking.customerName}</Text>
+                <Text style={styles.infoValue}>{booking.customerName || 'Quý khách'}</Text>
               </View>
               <View style={styles.infoCol}>
                 <Text style={styles.infoLabel}>SỐ ĐIỆN THOẠI</Text>
-                <Text style={styles.infoValue}>{booking.phone}</Text>
+                <Text style={styles.infoValue}>{booking.phone || (booking as any).customerPhone || 'Chưa cập nhật'}</Text>
               </View>
             </View>
 
