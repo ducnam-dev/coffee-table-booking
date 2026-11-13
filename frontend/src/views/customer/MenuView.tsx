@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   BackHandler,
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -79,6 +80,35 @@ export const MenuView: React.FC<MenuViewProps> = ({ route, navigation }) => {
   });
 
   const insets = useSafeAreaInsets();
+  const cartTotalItems = cart.reduce((sum, i) => sum + i.quantity, 0);
+
+  const handleQuickAdd = (item: MenuItem) => {
+    const userId = user?.id || 2;
+    TrackingModel.trackEvent(userId, item.id, 'order');
+    dispatch(
+      addToCart({
+        menuItemId: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: 1,
+      })
+    );
+    Alert.alert(
+      'Đã Thêm Món Vào Đặt Bàn',
+      `Đã thêm "${item.name}" vào danh sách đặt trước!`,
+      [
+        {
+          text: 'Chọn Thêm Món Khác',
+          style: 'cancel',
+        },
+        {
+          text: 'Quay Lại Đặt Bàn',
+          style: 'default',
+          onPress: () => navigation.navigate('CustomerTabs', { screen: 'Booking' }),
+        },
+      ]
+    );
+  };
 
   const handleBack = () => {
     // Luôn ưu tiên quay về màn hình Đặt Bàn nếu đang trong luồng đặt hoặc giỏ có món
@@ -124,6 +154,12 @@ export const MenuView: React.FC<MenuViewProps> = ({ route, navigation }) => {
               <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
             </AnimatedScaleButton>
             <Text style={styles.headerTitle}>Thực Đơn Quán</Text>
+            {cartTotalItems > 0 && (
+              <View style={styles.cartCountBadge}>
+                <Ionicons name="cart" size={13} color={colors.primaryDark} />
+                <Text style={styles.cartCountBadgeText}>{cartTotalItems} món</Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -238,18 +274,7 @@ export const MenuView: React.FC<MenuViewProps> = ({ route, navigation }) => {
                             />
                           </AnimatedScaleButton>
                           <AnimatedScaleButton
-                            onPress={() => {
-                              const userId = user?.id || 2;
-                              TrackingModel.trackEvent(userId, item.id, 'order');
-                              dispatch(
-                                addToCart({
-                                  menuItemId: item.id,
-                                  name: item.name,
-                                  price: item.price,
-                                  quantity: 1,
-                                })
-                              );
-                            }}
+                            onPress={() => handleQuickAdd(item)}
                             style={styles.addBtn}
                           >
                             <Ionicons name="add" size={18} color={colors.textInverse} />
@@ -309,6 +334,22 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...typography.h1,
     fontSize: 22,
+  },
+  cartCountBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.primarySubtle,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  cartCountBadgeText: {
+    ...typography.caption,
+    fontWeight: '800',
+    color: colors.primaryDark,
   },
   searchBar: {
     flexDirection: 'row',
