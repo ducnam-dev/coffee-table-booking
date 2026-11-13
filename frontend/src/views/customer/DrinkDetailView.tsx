@@ -90,11 +90,16 @@ export const DrinkDetailView: React.FC<DrinkDetailViewProps> = ({ route, navigat
         toppings: selectedToppings,
       })
     );
-    Alert.alert('Thành công', 'Đã thêm món vào giỏ chọn của bạn!', [
-      { text: 'Tiếp tục xem menu', onPress: () => navigation.goBack() },
+    Alert.alert('Đã Thêm Món Vào Đặt Bàn', `Đã thêm "${drink.name}" vào danh sách đặt trước!`, [
       {
-        text: 'Đặt bàn ngay',
+        text: 'Quay Lại Đặt Bàn',
+        style: 'default',
         onPress: () => navigation.navigate('CustomerTabs', { screen: 'Booking' }),
+      },
+      {
+        text: 'Chọn Thêm Món Khác',
+        style: 'cancel',
+        onPress: () => navigation.goBack(),
       },
     ]);
   };

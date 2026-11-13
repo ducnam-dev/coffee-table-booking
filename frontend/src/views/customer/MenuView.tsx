@@ -23,6 +23,7 @@ import { TrackingModel } from '../../models/TrackingModel';
 import { MenuItem, MenuCategory } from '../../types';
 
 interface MenuViewProps {
+  route?: { params?: { fromBooking?: boolean } };
   navigation: any;
 }
 
@@ -34,7 +35,7 @@ const CATEGORIES: { key: MenuCategory | 'ALL'; label: string; icon: any }[] = [
   { key: 'PASTRY', label: 'Bánh ngọt', icon: 'restaurant-outline' },
 ];
 
-export const MenuView: React.FC<MenuViewProps> = ({ navigation }) => {
+export const MenuView: React.FC<MenuViewProps> = ({ route, navigation }) => {
   const dispatch = useAppDispatch();
   const responsive = useResponsive();
   const user = useAppSelector((state) => state.auth.user);
@@ -91,7 +92,28 @@ export const MenuView: React.FC<MenuViewProps> = ({ navigation }) => {
           },
         ]}
       >
-        <Text style={styles.headerTitle}>Thực Đơn Quán</Text>
+        <View style={styles.headerTopRow}>
+          <View style={styles.headerLeftGroup}>
+            <AnimatedScaleButton
+              onPress={() => navigation.navigate('CustomerTabs', { screen: 'Booking' })}
+              style={styles.backBtn}
+            >
+              <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
+            </AnimatedScaleButton>
+            <Text style={styles.headerTitle}>Thực Đơn Quán</Text>
+          </View>
+
+          <AnimatedScaleButton
+            onPress={() => navigation.navigate('CustomerTabs', { screen: 'Booking' })}
+            style={styles.returnBookingHeaderBtn}
+          >
+            <Ionicons name="calendar-outline" size={15} color={colors.primaryDark} />
+            <Text style={styles.returnBookingHeaderText}>
+              {cartTotalItems > 0 ? `Về Đặt Bàn (${cartTotalItems})` : 'Về Đặt Bàn'}
+            </Text>
+          </AnimatedScaleButton>
+        </View>
+
         <View style={styles.searchBar}>
           <Ionicons name="search-outline" size={20} color={colors.textMuted} style={styles.searchIcon} />
           <TextInput
@@ -242,16 +264,22 @@ export const MenuView: React.FC<MenuViewProps> = ({ navigation }) => {
       {cartTotalItems > 0 && (
         <FadeInView style={styles.cartBarWrap}>
           <AnimatedScaleButton
-            onPress={() => navigation.navigate('Booking')}
+            onPress={() => navigation.navigate('CustomerTabs', { screen: 'Booking' })}
             style={styles.cartBarBtn}
           >
             <View style={styles.cartBarLeft}>
               <View style={styles.cartBadge}>
                 <Text style={styles.cartBadgeText}>{cartTotalItems}</Text>
               </View>
-              <Text style={styles.cartBarLabel}>Món đã chọn sẵn sàng đặt bàn</Text>
+              <View>
+                <Text style={styles.cartBarTitle}>Đã chọn {cartTotalItems} món nước</Text>
+                <Text style={styles.cartBarSub}>Chạm để quay lại màn hình Đặt Bàn</Text>
+              </View>
             </View>
-            <Ionicons name="arrow-forward" size={18} color={colors.textInverse} />
+            <View style={styles.cartBarAction}>
+              <Text style={styles.cartBarActionText}>Về Đặt Bàn</Text>
+              <Ionicons name="arrow-forward" size={16} color={colors.textInverse} />
+            </View>
           </AnimatedScaleButton>
         </FadeInView>
       )}
@@ -271,9 +299,43 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.xs,
+  },
+  headerLeftGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  backBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   headerTitle: {
     ...typography.h1,
-    marginBottom: spacing.sm,
+    fontSize: 22,
+  },
+  returnBookingHeaderBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.primarySubtle,
+    borderWidth: 1,
+    borderColor: colors.primaryDark,
+    borderRadius: radius.full,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 5,
+  },
+  returnBookingHeaderText: {
+    ...typography.caption,
+    fontWeight: '700',
+    color: colors.primaryDark,
   },
   searchBar: {
     flexDirection: 'row',
@@ -399,15 +461,18 @@ const styles = StyleSheet.create({
     bottom: spacing.lg,
     left: spacing.lg,
     right: spacing.lg,
+    ...shadows.prominent,
   },
   cartBarBtn: {
     backgroundColor: colors.espresso,
-    height: 52,
+    height: 56,
     borderRadius: radius.lg,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
     ...shadows.medium,
   },
   cartBarLeft: {
@@ -428,10 +493,29 @@ const styles = StyleSheet.create({
     color: colors.textInverse,
     fontWeight: '800',
   },
-  cartBarLabel: {
-    ...typography.bodyLarge,
-    color: colors.textInverse,
+  cartBarTitle: {
+    ...typography.body,
     fontWeight: '700',
+    color: colors.textInverse,
+  },
+  cartBarSub: {
+    ...typography.caption,
+    fontSize: 11,
+    color: colors.primaryLight,
+  },
+  cartBarAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+    borderRadius: radius.md,
+  },
+  cartBarActionText: {
+    ...typography.caption,
+    fontWeight: '700',
+    color: colors.textInverse,
   },
 });
 

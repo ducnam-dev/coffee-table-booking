@@ -262,7 +262,14 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
         <FadeInView delay={240} style={styles.sectionWrap}>
           <View style={styles.rowBetween}>
             <Text style={styles.sectionHeading}>4. Món Đặt Trước ({cart.length})</Text>
-            <AnimatedScaleButton onPress={() => navigation.navigate('Menu')}>
+            <AnimatedScaleButton
+              onPress={() =>
+                navigation.navigate('CustomerTabs', {
+                  screen: 'Menu',
+                  params: { fromBooking: true },
+                })
+              }
+            >
               <Text style={styles.viewMapText}>+ Thêm món</Text>
             </AnimatedScaleButton>
           </View>
@@ -273,7 +280,12 @@ export const BookingView: React.FC<BookingViewProps> = ({ route, navigation }) =
                 <Ionicons name="cafe-outline" size={32} color={colors.textMuted} />
                 <Text style={styles.emptyCartText}>Chưa chọn món nước nào</Text>
                 <AnimatedScaleButton
-                  onPress={() => navigation.navigate('Menu')}
+                  onPress={() =>
+                    navigation.navigate('CustomerTabs', {
+                      screen: 'Menu',
+                      params: { fromBooking: true },
+                    })
+                  }
                   style={styles.pickDrinkBtn}
                 >
                   <Text style={styles.pickDrinkBtnText}>Chọn món ngay</Text>
