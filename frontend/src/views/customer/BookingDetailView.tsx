@@ -27,13 +27,13 @@ export const BookingDetailView: React.FC<BookingDetailViewProps> = ({ route, nav
   const getStatusBadge = (status: ReservationStatus): { label: string; variant: BadgeVariant } => {
     switch (status) {
       case 'CONFIRMED':
-        return { label: 'Đã Xác Nhận', variant: 'success' };
+        return { label: 'Đã xác nhận', variant: 'success' };
       case 'PENDING':
-        return { label: 'Chờ Quán Duyệt', variant: 'warning' };
+        return { label: 'Chờ duyệt', variant: 'warning' };
       case 'CANCELLED':
-        return { label: 'Đã Hủy', variant: 'danger' };
+        return { label: 'Đã hủy', variant: 'danger' };
       case 'COMPLETED':
-        return { label: 'Đã Hoàn Thành', variant: 'info' };
+        return { label: 'Hoàn thành', variant: 'info' };
     }
   };
 
@@ -60,11 +60,13 @@ export const BookingDetailView: React.FC<BookingDetailViewProps> = ({ route, nav
         {/* Physical Coffee Ticket Card */}
         <FadeInView style={styles.ticketCard}>
           <View style={styles.ticketHeader}>
-            <View>
+            <View style={styles.ticketTitleCol}>
               <Text style={styles.brandName}>PAM COFFEE & TEA</Text>
-              <Text style={styles.ticketSub}>Phiếu Xác Nhận Giữ Chỗ</Text>
+              <Text style={styles.ticketSub} numberOfLines={1}>Phiếu Giữ Chỗ</Text>
             </View>
-            <Badge label={statusBadge.label} variant={statusBadge.variant} />
+            <View style={styles.statusBadgeWrap}>
+              <Badge label={statusBadge.label} variant={statusBadge.variant} style={styles.statusBadge} />
+            </View>
           </View>
 
           {/* Perforated Divider */}
@@ -128,7 +130,7 @@ export const BookingDetailView: React.FC<BookingDetailViewProps> = ({ route, nav
                 <Text style={styles.itemsHeading}>MÓN ĐÃ ĐẶT TRƯỚC</Text>
                 {booking.orderItems.map((item, i) => (
                   <View key={i} style={styles.itemRow}>
-                    <Text style={styles.itemName}>
+                    <Text style={styles.itemName} numberOfLines={1}>
                       {item.quantity}x {item.name}
                     </Text>
                     <Text style={styles.itemPrice}>
@@ -154,16 +156,16 @@ export const BookingDetailView: React.FC<BookingDetailViewProps> = ({ route, nav
             onPress={() => navigation.navigate('MyBookings')}
             style={styles.historyBtn}
           >
-            <Ionicons name="time-outline" size={18} color={colors.primaryDark} />
-            <Text style={styles.historyBtnText}>Lịch Sử Đặt Bàn</Text>
+            <Ionicons name="time-outline" size={16} color={colors.primaryDark} />
+            <Text style={styles.historyBtnText} numberOfLines={1}>Lịch Sử Đặt Bàn</Text>
           </AnimatedScaleButton>
 
           <AnimatedScaleButton
             onPress={() => navigation.navigate('CustomerTabs', { screen: 'Home' })}
             style={styles.homeBtn}
           >
-            <Ionicons name="home-outline" size={18} color={colors.textInverse} />
-            <Text style={styles.homeBtnText}>Về Trang Chủ</Text>
+            <Ionicons name="home-outline" size={16} color={colors.textInverse} />
+            <Text style={styles.homeBtnText} numberOfLines={1}>Về Trang Chủ</Text>
           </AnimatedScaleButton>
         </View>
 
@@ -220,9 +222,14 @@ const styles = StyleSheet.create({
   ticketHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    padding: spacing.xl,
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     backgroundColor: colors.surfaceSubtle,
+  },
+  ticketTitleCol: {
+    flex: 1,
+    marginRight: spacing.sm,
   },
   brandName: {
     ...typography.overline,
@@ -230,8 +237,18 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   ticketSub: {
-    ...typography.h2,
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.espresso,
     marginTop: 2,
+  },
+  statusBadgeWrap: {
+    alignItems: 'flex-end',
+    flexShrink: 0,
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
   },
   perforatedLine: {
     position: 'relative',
@@ -335,10 +352,14 @@ const styles = StyleSheet.create({
   itemRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 2,
+    alignItems: 'center',
+    marginVertical: 3,
+    gap: spacing.sm,
   },
   itemName: {
     ...typography.bodySmall,
+    flex: 1,
+    paddingRight: spacing.xs,
   },
   itemPrice: {
     ...typography.bodySmall,
@@ -368,12 +389,12 @@ const styles = StyleSheet.create({
   },
   actionsRow: {
     flexDirection: 'row',
-    gap: spacing.md,
+    gap: spacing.sm,
     marginTop: spacing.xl,
   },
   historyBtn: {
     flex: 1,
-    height: 48,
+    height: 46,
     borderRadius: radius.md,
     backgroundColor: colors.surface,
     borderWidth: 1.5,
@@ -381,28 +402,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.xs,
+    paddingHorizontal: spacing.xs,
+    gap: 6,
   },
   historyBtnText: {
-    ...typography.bodyLarge,
-    color: colors.primaryDark,
+    fontSize: 13,
     fontWeight: '700',
+    color: colors.primaryDark,
+    letterSpacing: 0.2,
   },
   homeBtn: {
     flex: 1,
-    height: 48,
+    height: 46,
     borderRadius: radius.md,
     backgroundColor: colors.espresso,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.xs,
+    paddingHorizontal: spacing.xs,
+    gap: 6,
     ...shadows.soft,
   },
   homeBtnText: {
-    ...typography.bodyLarge,
-    color: colors.textInverse,
+    fontSize: 13,
     fontWeight: '700',
+    color: colors.textInverse,
+    letterSpacing: 0.2,
   },
   contactSecondaryBtn: {
     flexDirection: 'row',
