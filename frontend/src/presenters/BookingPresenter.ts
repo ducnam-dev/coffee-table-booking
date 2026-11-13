@@ -72,9 +72,21 @@ export class BookingPresenter {
 
     const cleanTime = (bookingData.reservationTime || '').trim();
     if (!cleanTime) {
-      this.view.showError('Vui lòng chọn hoặc tự nhập khung giờ bạn muốn đến');
+      this.view.showError('Vui lòng nhập khung giờ bạn muốn đến');
       return;
     }
+    const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+    if (!timeRegex.test(cleanTime)) {
+      this.view.showError(
+        'Khung giờ đến không hợp lệ! Vui lòng nhập đúng định dạng giờ:phút (ví dụ: 08:30 hoặc 14:00).'
+      );
+      return;
+    }
+    let normalizedTime = cleanTime;
+    if (/^[0-9]:[0-5][0-9]$/.test(cleanTime)) {
+      normalizedTime = `0${cleanTime}`;
+    }
+
     if (!bookingData.selectedTable) {
       this.view.showError('Vui lòng chọn bàn bạn muốn ngồi');
       return;
@@ -92,7 +104,7 @@ export class BookingPresenter {
         tableId: bookingData.selectedTable.id,
         tableNumber: bookingData.selectedTable.tableNumber,
         reservationDate: bookingData.reservationDate,
-        reservationTime: bookingData.reservationTime,
+        reservationTime: normalizedTime,
         guestCount: bookingData.guestCount,
         orderItems: bookingData.orderItems,
         totalAmount: drinkTotal,
