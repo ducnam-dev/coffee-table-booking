@@ -1,7 +1,7 @@
 import time
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Query, Depends
-from schemas import CoffeeTable, CoffeeTableCreate
+from schemas import CoffeeTable, CoffeeTableCreate, StatusUpdateRequest
 from database import db
 from middleware import require_role
 
@@ -43,11 +43,20 @@ def create_table(table_data: CoffeeTableCreate, current_user: dict = Depends(req
     return new_table
 
 @router.put("/{table_id}/status", response_model=CoffeeTable)
-def update_table_status(table_id: int, status: str = Query(...), current_user: dict = Depends(require_role("ROLE_MANAGER"))):
+def update_table_status(
+    table_id: int,
+    status: Optional[str] = Query(None),
+    body: Optional[StatusUpdateRequest] = None,
+    current_user: dict = Depends(require_role("ROLE_MANAGER"))
+):
+    target_status = (body.status if body and body.status else status)
+    if not target_status:
+        raise HTTPException(status_code=400, detail="Thiếu trạng thái status")
+
     tables = db.data.get("tables", [])
     for t in tables:
         if t["id"] == table_id:
-            t["status"] = status
+            t["status"] = target_status
             db.save()
             return t
     raise HTTPException(status_code=404, detail="Table not found")
