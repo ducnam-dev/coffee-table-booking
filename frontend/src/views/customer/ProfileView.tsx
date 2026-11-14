@@ -58,7 +58,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ navigation }) => {
             onPress: async () => {
               const managerUser = await UserModel.login('manager', 'manager');
               dispatch({ type: 'auth/setUser', payload: managerUser });
-              navigation.reset({ index: 0, routes: [{ name: 'AdminDashboard' }] });
             },
           },
         ]

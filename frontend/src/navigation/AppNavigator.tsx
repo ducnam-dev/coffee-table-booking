@@ -140,6 +140,14 @@ export function AppNavigator() {
             <Stack.Screen name="AdminUsers" component={AdminUsersView} />
             <Stack.Screen name="AdminUserTracking" component={AdminUserTrackingView} />
             <Stack.Screen name="AdminPromotions" component={AdminPromotionsView} />
+            {/* Cho phép Manager chuyển sang xem Giao diện Khách */}
+            <Stack.Screen name="CustomerTabs" component={CustomerTabs} />
+            <Stack.Screen name="DrinkDetail" component={DrinkDetailView} />
+            <Stack.Screen name="Tables" component={TablesView} />
+            <Stack.Screen name="BookingDetail" component={BookingDetailView} />
+            <Stack.Screen name="MyBookings" component={MyBookingsView} />
+            <Stack.Screen name="Notifications" component={NotificationsView} />
+            <Stack.Screen name="Favorites" component={FavoritesView} />
           </>
         ) : (
           // Customer Flow - hiển thị khi là Customer
