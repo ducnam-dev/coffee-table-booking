@@ -1,17 +1,25 @@
-import { Platform } from 'react-native';
+import { Platform, NativeModules } from 'react-native';
 
 const getDevHost = (): string => {
   if (Platform.OS === 'web') {
     return 'localhost';
   }
-  // Dùng IP LAN máy tính để điện thoại quét mã Expo Go kết nối được FastAPI
-  return '192.168.1.105';
+  // Tự động lấy IP máy tính từ URL gói JS của Expo (hoạt động ở mọi mạng Wi-Fi)
+  const scriptURL = NativeModules.SourceCode?.scriptURL;
+  if (scriptURL) {
+    const match = scriptURL.match(/^https?:\/\/([^:/]+)/);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+  // Dự phòng theo IP Wi-Fi hiện tại của máy tính
+  return '192.168.88.179';
 };
 
 export const API_CONFIG = {
   BASE_URL: `http://${getDevHost()}:8080/api`,
   FASTAPI_DOCS: `http://${getDevHost()}:8080/docs`,
-  TIMEOUT: 8000,
+  TIMEOUT: 3500,
   ENDPOINTS: {
     AUTH_LOGIN: '/auth/login',
     AUTH_SIGNUP: '/auth/signup',
