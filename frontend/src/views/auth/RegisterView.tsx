@@ -39,12 +39,7 @@ export const RegisterView: React.FC<RegisterViewProps> = ({ navigation }) => {
     onLoginSuccess: () => {},
     onRegisterSuccess: (user: User) => {
       dispatch(setUser(user));
-      Alert.alert('Thành công', 'Đăng ký tài khoản thành công!', [
-        {
-          text: 'Bắt đầu',
-          onPress: () => navigation.reset({ index: 0, routes: [{ name: 'CustomerTabs' }] }),
-        },
-      ]);
+      Alert.alert('Thành công', 'Đăng ký tài khoản thành công!');
     },
   };
 

@@ -35,11 +35,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ navigation }) => {
     showError: (msg) => Alert.alert('Thông báo', msg),
     onLoginSuccess: (user: User) => {
       dispatch(setUser(user));
-      if (user.role === 'ROLE_MANAGER' || user.role === 'ROLE_ADMIN') {
-        navigation.reset({ index: 0, routes: [{ name: 'AdminDashboard' }] });
-      } else {
-        navigation.reset({ index: 0, routes: [{ name: 'CustomerTabs' }] });
-      }
+      // AppNavigator tự động chuyển sang CustomerTabs hoặc AdminDashboard dựa theo user.role và isAuthenticated
     },
     onRegisterSuccess: () => {},
   };

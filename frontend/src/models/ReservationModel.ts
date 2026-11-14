@@ -39,9 +39,10 @@ let MOCK_RESERVATIONS: Reservation[] = [
 ];
 
 export class ReservationModel {
-  static async getAllReservations(): Promise<Reservation[]> {
+  static async getAllReservations(userId?: number): Promise<Reservation[]> {
     try {
-      const res = await axiosClient.get('/reservations');
+      const url = userId ? `/reservations?user_id=${userId}` : '/reservations';
+      const res = await axiosClient.get(url);
       if (Array.isArray(res.data) && res.data.length > 0) {
         return res.data.map((r: any) => ({
           id: r.id,
@@ -49,7 +50,7 @@ export class ReservationModel {
           phone: r.customerPhone || r.phone || '0901234567',
           email: r.customerEmail || r.email || '',
           tableId: r.coffeeTable?.id || r.tableId || 1,
-          tableNumber: r.coffeeTable?.name || r.tableNumber || `B0${r.coffeeTable?.id || 1}`,
+          tableNumber: r.tableNumber || r.coffeeTable?.name || `B0${r.coffeeTable?.id || r.tableId || 1}`,
           reservationDate: r.reservationTime ? r.reservationTime.split('T')[0] : r.reservationDate || '2026-11-14',
           reservationTime: r.timeDisplay || (r.reservationTime ? r.reservationTime.split('T')[1]?.slice(0, 5) : '19:00'),
           guestCount: r.guestNumber || r.guestCount || 2,

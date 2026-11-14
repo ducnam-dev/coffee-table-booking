@@ -78,7 +78,7 @@ export const AdminDashboardView: React.FC<{ navigation: any }> = ({ navigation }
 
         <View style={styles.headerRight}>
           <AnimatedScaleButton
-            onPress={() => navigation.reset({ index: 0, routes: [{ name: 'CustomerTabs' }] })}
+            onPress={() => navigation.navigate('CustomerTabs')}
             style={styles.switchModeBtn}
           >
             <Ionicons name="swap-horizontal" size={16} color={colors.textPrimary} />
