@@ -81,6 +81,22 @@
       "isNearWindow": true,
       "isOutdoor": false,
       "hasSocket": true
+    },
+    {
+      "id": 1794623923838,
+      "name": "Bàn 07",
+      "seats": 4,
+      "type": "Phòng lạnh",
+      "status": "AVAILABLE",
+      "isNearWindow": false,
+      "isOutdoor": false,
+      "hasSocket": true,
+      "tableNumber": "B07",
+      "capacity": 4,
+      "area": "INDOOR",
+      "description": "Bàn 07 - Không gian mới",
+      "hasPowerOutlet": true,
+      "isWindowView": false
     }
   ],
   "menu": [
@@ -283,7 +299,7 @@
       "timeDisplay": "Hôm nay",
       "guestNumber": 2,
       "note": "",
-      "status": "PENDING",
+      "status": "CONFIRMED",
       "orderItems": []
     },
     {

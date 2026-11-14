@@ -37,7 +37,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ navigation }) => {
         onPress: async () => {
           await UserModel.logout();
           dispatch(logout());
-          navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+          // Navigator sẽ tự động chuyển về Login khi isAuthenticated = false
         },
       },
     ]);

@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, typography, shadows, spacing } from '../theme/designTokens';
+import { useAppSelector } from '../store';
 
 // Auth Views
 import { LoginView } from '../views/auth/LoginView';
@@ -116,30 +117,50 @@ function CustomerTabs() {
 }
 
 export function AppNavigator() {
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const user = useAppSelector((state) => state.auth.user);
+  const isManager = user?.role === 'ROLE_MANAGER' || user?.role === 'ROLE_ADMIN';
+
   return (
     <NavigationContainer>
       <Stack.Navigator id="root-stack" screenOptions={{ headerShown: false }}>
-        {/* Auth Flow */}
-        <Stack.Screen name="Login" component={LoginView} />
-        <Stack.Screen name="Register" component={RegisterView} />
-
-        {/* Customer Main Flow */}
-        <Stack.Screen name="CustomerTabs" component={CustomerTabs} />
-        <Stack.Screen name="DrinkDetail" component={DrinkDetailView} />
-        <Stack.Screen name="Tables" component={TablesView} />
-        <Stack.Screen name="BookingDetail" component={BookingDetailView} />
-        <Stack.Screen name="MyBookings" component={MyBookingsView} />
-        <Stack.Screen name="Notifications" component={NotificationsView} />
-        <Stack.Screen name="Favorites" component={FavoritesView} />
-
-        {/* Admin Flow */}
-        <Stack.Screen name="AdminDashboard" component={AdminDashboardView} />
-        <Stack.Screen name="AdminBookings" component={AdminBookingsView} />
-        <Stack.Screen name="AdminTables" component={AdminTablesView} />
-        <Stack.Screen name="AdminMenu" component={AdminMenuView} />
-        <Stack.Screen name="AdminUsers" component={AdminUsersView} />
-        <Stack.Screen name="AdminUserTracking" component={AdminUserTrackingView} />
-        <Stack.Screen name="AdminPromotions" component={AdminPromotionsView} />
+        {!isAuthenticated ? (
+          // Auth Flow - hiển thị khi chưa đăng nhập
+          <>
+            <Stack.Screen name="Login" component={LoginView} />
+            <Stack.Screen name="Register" component={RegisterView} />
+          </>
+        ) : isManager ? (
+          // Admin Flow - hiển thị khi là Manager/Admin
+          <>
+            <Stack.Screen name="AdminDashboard" component={AdminDashboardView} />
+            <Stack.Screen name="AdminBookings" component={AdminBookingsView} />
+            <Stack.Screen name="AdminTables" component={AdminTablesView} />
+            <Stack.Screen name="AdminMenu" component={AdminMenuView} />
+            <Stack.Screen name="AdminUsers" component={AdminUsersView} />
+            <Stack.Screen name="AdminUserTracking" component={AdminUserTrackingView} />
+            <Stack.Screen name="AdminPromotions" component={AdminPromotionsView} />
+          </>
+        ) : (
+          // Customer Flow - hiển thị khi là Customer
+          <>
+            <Stack.Screen name="CustomerTabs" component={CustomerTabs} />
+            <Stack.Screen name="DrinkDetail" component={DrinkDetailView} />
+            <Stack.Screen name="Tables" component={TablesView} />
+            <Stack.Screen name="BookingDetail" component={BookingDetailView} />
+            <Stack.Screen name="MyBookings" component={MyBookingsView} />
+            <Stack.Screen name="Notifications" component={NotificationsView} />
+            <Stack.Screen name="Favorites" component={FavoritesView} />
+            {/* Cho phép Customer chuyển sang Admin nếu được cấp quyền */}
+            <Stack.Screen name="AdminDashboard" component={AdminDashboardView} />
+            <Stack.Screen name="AdminBookings" component={AdminBookingsView} />
+            <Stack.Screen name="AdminTables" component={AdminTablesView} />
+            <Stack.Screen name="AdminMenu" component={AdminMenuView} />
+            <Stack.Screen name="AdminUsers" component={AdminUsersView} />
+            <Stack.Screen name="AdminUserTracking" component={AdminUserTrackingView} />
+            <Stack.Screen name="AdminPromotions" component={AdminPromotionsView} />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
