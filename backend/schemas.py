@@ -137,3 +137,20 @@ class ProductAnalytics(BaseModel):
     mostViewed: List[Dict[str, Any]] = []
     mostOrdered: List[Dict[str, Any]] = []
     totalEvents: int = 0
+
+# Promotion Schemas
+class PromotionBase(BaseModel):
+    code: str
+    title: str
+    description: Optional[str] = ""
+    discountPercent: int = 10
+    maxDiscount: Optional[int] = 50000
+    minOrderValue: Optional[int] = 0
+    validUntil: Optional[str] = "2026-12-31"
+    isActive: bool = True
+
+class PromotionCreate(PromotionBase):
+    pass
+
+class Promotion(PromotionBase):
+    id: int

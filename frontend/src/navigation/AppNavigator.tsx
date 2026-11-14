@@ -31,6 +31,7 @@ import { AdminTablesView } from '../views/admin/AdminTablesView';
 import { AdminMenuView } from '../views/admin/AdminMenuView';
 import { AdminUsersView } from '../views/admin/AdminUsersView';
 import { AdminUserTrackingView } from '../views/admin/AdminUserTrackingView';
+import { AdminPromotionsView } from '../views/admin/AdminPromotionsView';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -138,6 +139,7 @@ export function AppNavigator() {
         <Stack.Screen name="AdminMenu" component={AdminMenuView} />
         <Stack.Screen name="AdminUsers" component={AdminUsersView} />
         <Stack.Screen name="AdminUserTracking" component={AdminUserTrackingView} />
+        <Stack.Screen name="AdminPromotions" component={AdminPromotionsView} />
       </Stack.Navigator>
     </NavigationContainer>
   );

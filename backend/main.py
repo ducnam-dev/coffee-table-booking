@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import auth, tables, menu, reservations, users, ai, tracking
+from routers import auth, tables, menu, reservations, users, ai, tracking, promotions
 
 app = FastAPI(
     title="Pam Coffee & Tea API (FastAPI Backend)",
@@ -28,6 +28,7 @@ app.include_router(reservations.router)
 app.include_router(users.router)
 app.include_router(ai.router)
 app.include_router(tracking.router)
+app.include_router(promotions.router)
 
 @app.get("/")
 def root():

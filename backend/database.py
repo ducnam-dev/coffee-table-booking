@@ -100,6 +100,42 @@ DEFAULT_FAVORITES = [
     {"userId": 2, "menuItemId": 9, "timestamp": 1731400050000},
 ]
 
+DEFAULT_PROMOTIONS = [
+    {
+        "id": 1,
+        "code": "PAMWELCOME",
+        "title": "Ưu đãi khách hàng mới",
+        "description": "Giảm ngay 20% cho đơn đặt bàn đầu tiên tại Pam Coffee & Tea",
+        "discountPercent": 20,
+        "maxDiscount": 50000,
+        "minOrderValue": 50000,
+        "validUntil": "2026-12-31",
+        "isActive": True
+    },
+    {
+        "id": 2,
+        "code": "HAPPYHOUR",
+        "title": "Happy Hour Sáng Vàng",
+        "description": "Giảm 15% tổng hóa đơn khung giờ 08:00 - 11:00 các ngày trong tuần",
+        "discountPercent": 15,
+        "maxDiscount": 40000,
+        "minOrderValue": 40000,
+        "validUntil": "2026-12-31",
+        "isActive": True
+    },
+    {
+        "id": 3,
+        "code": "WEEKENDVIP",
+        "title": "Cuối tuần tụ họp VIP",
+        "description": "Giảm 10% cho bàn tiệc từ 4 người trở lên vào Thứ 7 & Chủ Nhật",
+        "discountPercent": 10,
+        "maxDiscount": 100000,
+        "minOrderValue": 100000,
+        "validUntil": "2026-12-31",
+        "isActive": True
+    }
+]
+
 class Database:
     def __init__(self):
         self.data: Dict[str, List[Dict[str, Any]]] = {
@@ -108,7 +144,8 @@ class Database:
             "menu": DEFAULT_MENU,
             "reservations": DEFAULT_RESERVATIONS,
             "user_tracking": DEFAULT_TRACKING,
-            "user_favorites": DEFAULT_FAVORITES
+            "user_favorites": DEFAULT_FAVORITES,
+            "promotions": DEFAULT_PROMOTIONS
         }
         self.load()
 

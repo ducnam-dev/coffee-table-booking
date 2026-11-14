@@ -86,7 +86,19 @@ export class MenuModel {
   static async getAllMenuItems(): Promise<MenuItem[]> {
     try {
       const res = await axiosClient.get('/menu');
-      return res.data;
+      if (Array.isArray(res.data) && res.data.length > 0) {
+        return res.data.map((m: any) => ({
+          id: m.id,
+          name: m.name,
+          category: (m.category === 'Trà Sữa' ? 'TEA' : m.category === 'Trà Trái Cây' ? 'TEA' : m.category === 'Ca Cao' ? 'COFFEE' : m.category === 'Sữa Tươi' ? 'SPECIAL' : m.category || 'COFFEE') as any,
+          price: m.price || 20000,
+          description: m.description || '',
+          image: m.image || 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=500',
+          isAvailable: m.available !== undefined ? m.available : true,
+          isSignature: m.isSignature || false,
+        }));
+      }
+      return MOCK_MENU;
     } catch {
       return MOCK_MENU;
     }
@@ -103,8 +115,22 @@ export class MenuModel {
 
   static async createMenuItem(item: Partial<MenuItem>): Promise<MenuItem> {
     try {
-      const res = await axiosClient.post('/menu', item);
-      return res.data;
+      const res = await axiosClient.post('/menu', {
+        name: item.name,
+        category: item.category === 'COFFEE' ? 'Cà Phê' : item.category === 'TEA' ? 'Trà Trái Cây' : item.category === 'PASTRY' ? 'Bánh Ngọt' : 'Đặc Sản',
+        price: item.price || 40000,
+        description: item.description || '',
+        available: item.isAvailable !== undefined ? item.isAvailable : true,
+      });
+      return {
+        id: res.data.id,
+        name: res.data.name,
+        category: item.category || 'COFFEE',
+        price: res.data.price,
+        description: res.data.description,
+        image: item.image || 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=500',
+        isAvailable: res.data.available,
+      };
     } catch {
       const newItem: MenuItem = {
         id: Date.now(),

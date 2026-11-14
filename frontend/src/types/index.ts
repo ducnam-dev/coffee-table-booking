@@ -93,3 +93,15 @@ export interface AICoffeeRecommendation {
   baristaTip: string;
 }
 
+export interface Promotion {
+  id: number;
+  code: string;
+  title: string;
+  description: string;
+  discountPercent: number;
+  maxDiscount?: number;
+  minOrderValue?: number;
+  validUntil: string;
+  isActive: boolean;
+}
+

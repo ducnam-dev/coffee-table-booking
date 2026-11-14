@@ -23,6 +23,7 @@ export const API_CONFIG = {
     TRACKING_FAVORITES: '/tracking/favorites',
     TRACKING_RECOMMENDATIONS: '/tracking/recommendations',
     TRACKING_ANALYTICS: '/tracking/analytics',
+    PROMOTIONS: '/promotions',
   },
 };
 

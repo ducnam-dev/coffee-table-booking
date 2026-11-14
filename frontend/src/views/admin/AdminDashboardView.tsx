@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, spacing, typography, shadows } from '../../theme/designTokens';
 import { useResponsive } from '../../theme/responsive';
@@ -28,7 +28,6 @@ import { UserModel } from '../../models/UserModel';
 export const AdminDashboardView: React.FC<{ navigation: any }> = ({ navigation }) => {
   const dispatch = useAppDispatch();
   const responsive = useResponsive();
-  const insets = useSafeAreaInsets();
   const [data, setData] = useState<AdminDashboardData | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -40,9 +39,15 @@ export const AdminDashboardView: React.FC<{ navigation: any }> = ({ navigation }
 
   const presenter = new AdminDashboardPresenter(viewCallbacks);
 
-  useEffect(() => {
+  const refreshData = useCallback(() => {
     presenter.loadDashboardData();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshData();
+    }, [refreshData])
+  );
 
   const handleLogout = () => {
     Alert.alert('Đăng Xuất', 'Bạn muốn đăng xuất quyền Quản trị?', [
@@ -62,15 +67,7 @@ export const AdminDashboardView: React.FC<{ navigation: any }> = ({ navigation }
   return (
     <View style={styles.container}>
       {/* Top Bar */}
-      <View
-        style={[
-          styles.header,
-          {
-            paddingHorizontal: responsive.horizontalPadding,
-            paddingTop: Math.max(insets.top, 16) + spacing.xs,
-          },
-        ]}
-      >
+      <View style={[styles.header, { paddingHorizontal: responsive.horizontalPadding }]}>
         <View>
           <View style={styles.badgeRow}>
             <Ionicons name="shield-checkmark" size={16} color={colors.primaryDark} />
@@ -108,48 +105,82 @@ export const AdminDashboardView: React.FC<{ navigation: any }> = ({ navigation }
           <FadeInView style={styles.metricsGrid}>
             <View style={styles.metricRow}>
               {/* Metric 1: Doanh thu */}
-              <BentoCard variant="dark" padding="md" style={styles.metricCard}>
-                <View style={styles.metricIconWrap}>
-                  <Ionicons name="cash-outline" size={20} color={colors.primaryLight} />
-                </View>
-                <Text style={styles.metricLabelDark}>DOANH THU ƯỚC TÍNH</Text>
-                <Text style={styles.metricValueDark}>
-                  {(data?.totalRevenue || 0).toLocaleString('vi-VN')} đ
-                </Text>
-              </BentoCard>
+              <AnimatedScaleButton
+                onPress={() => navigation.navigate('AdminBookings')}
+                style={{ flex: 1 }}
+              >
+                <BentoCard variant="dark" padding="md" style={styles.metricCard}>
+                  <View style={styles.metricHeaderRow}>
+                    <View style={styles.metricIconWrap}>
+                      <Ionicons name="cash-outline" size={20} color={colors.primaryLight} />
+                    </View>
+                    <Ionicons name="chevron-forward" size={16} color={colors.textInverseMuted} />
+                  </View>
+                  <Text style={styles.metricLabelDark}>DOANH THU ƯỚC TÍNH</Text>
+                  <Text style={styles.metricValueDark}>
+                    {(data?.totalRevenue || 0).toLocaleString('vi-VN')} đ
+                  </Text>
+                  <Text style={styles.metricSubDark}>Bấm để xem chi tiết</Text>
+                </BentoCard>
+              </AnimatedScaleButton>
 
               {/* Metric 2: Đơn chờ duyệt */}
-              <BentoCard variant="amber" padding="md" style={styles.metricCard}>
-                <View style={styles.metricIconWrap}>
-                  <Ionicons name="time-outline" size={20} color={colors.primaryDark} />
-                </View>
-                <Text style={styles.metricLabel}>ĐƠN CHỜ PHÊ DUYỆT</Text>
-                <Text style={styles.metricValue}>{data?.pendingCount || 0} đơn</Text>
-              </BentoCard>
+              <AnimatedScaleButton
+                onPress={() => navigation.navigate('AdminBookings')}
+                style={{ flex: 1 }}
+              >
+                <BentoCard variant="amber" padding="md" style={styles.metricCard}>
+                  <View style={styles.metricHeaderRow}>
+                    <View style={styles.metricIconWrap}>
+                      <Ionicons name="time-outline" size={20} color={colors.primaryDark} />
+                    </View>
+                    <Ionicons name="chevron-forward" size={16} color={colors.espresso} />
+                  </View>
+                  <Text style={styles.metricLabel}>ĐƠN CHỜ PHÊ DUYỆT</Text>
+                  <Text style={styles.metricValue}>{data?.pendingCount || 0} đơn</Text>
+                  <Text style={styles.metricSub}>Bấm để duyệt ngay</Text>
+                </BentoCard>
+              </AnimatedScaleButton>
             </View>
 
             <View style={styles.metricRow}>
               {/* Metric 3: Tỷ lệ lấp đầy */}
-              <BentoCard variant="elevated" padding="md" style={styles.metricCard}>
-                <View style={styles.metricIconWrap}>
-                  <Ionicons name="pie-chart-outline" size={20} color={colors.espresso} />
-                </View>
-                <Text style={styles.metricLabel}>TỶ LỆ LẤP ĐẦY</Text>
-                <Text style={styles.metricValue}>{data?.occupancyRate || 0}%</Text>
-                <Text style={styles.metricSub}>
-                  Còn {data?.availableTables || 0}/{data?.totalTables || 0} bàn trống
-                </Text>
-              </BentoCard>
+              <AnimatedScaleButton
+                onPress={() => navigation.navigate('AdminTables')}
+                style={{ flex: 1 }}
+              >
+                <BentoCard variant="elevated" padding="md" style={styles.metricCard}>
+                  <View style={styles.metricHeaderRow}>
+                    <View style={styles.metricIconWrap}>
+                      <Ionicons name="pie-chart-outline" size={20} color={colors.espresso} />
+                    </View>
+                    <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+                  </View>
+                  <Text style={styles.metricLabel}>TỶ LỆ LẤP ĐẦY</Text>
+                  <Text style={styles.metricValue}>{data?.occupancyRate || 0}%</Text>
+                  <Text style={styles.metricSub}>
+                    Còn {data?.availableTables || 0}/{data?.totalTables || 0} bàn trống
+                  </Text>
+                </BentoCard>
+              </AnimatedScaleButton>
 
               {/* Metric 4: Tổng lượt đặt */}
-              <BentoCard variant="elevated" padding="md" style={styles.metricCard}>
-                <View style={styles.metricIconWrap}>
-                  <Ionicons name="calendar-outline" size={20} color={colors.espresso} />
-                </View>
-                <Text style={styles.metricLabel}>TỔNG LƯỢT ĐẶT</Text>
-                <Text style={styles.metricValue}>{data?.totalReservations || 0} lượt</Text>
-                <Text style={styles.metricSub}>{data?.confirmedCount || 0} đã xác nhận</Text>
-              </BentoCard>
+              <AnimatedScaleButton
+                onPress={() => navigation.navigate('AdminBookings')}
+                style={{ flex: 1 }}
+              >
+                <BentoCard variant="elevated" padding="md" style={styles.metricCard}>
+                  <View style={styles.metricHeaderRow}>
+                    <View style={styles.metricIconWrap}>
+                      <Ionicons name="calendar-outline" size={20} color={colors.espresso} />
+                    </View>
+                    <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+                  </View>
+                  <Text style={styles.metricLabel}>TỔNG LƯỢT ĐẶT</Text>
+                  <Text style={styles.metricValue}>{data?.totalReservations || 0} lượt</Text>
+                  <Text style={styles.metricSub}>{data?.confirmedCount || 0} đã xác nhận</Text>
+                </BentoCard>
+              </AnimatedScaleButton>
             </View>
           </FadeInView>
 
@@ -175,7 +206,7 @@ export const AdminDashboardView: React.FC<{ navigation: any }> = ({ navigation }
                 <BentoCard variant="elevated" padding="md" style={styles.navCard}>
                   <Ionicons name="grid-outline" size={26} color={colors.primary} />
                   <Text style={styles.navTitle}>QL Bàn</Text>
-                  <Text style={styles.navDesc}>Sơ đồ & tình trạng</Text>
+                  <Text style={styles.navDesc}>Sơ đồ & thêm bàn</Text>
                 </BentoCard>
               </AnimatedScaleButton>
             </View>
@@ -193,6 +224,19 @@ export const AdminDashboardView: React.FC<{ navigation: any }> = ({ navigation }
               </AnimatedScaleButton>
 
               <AnimatedScaleButton
+                onPress={() => navigation.navigate('AdminPromotions')}
+                style={styles.navBtn}
+              >
+                <BentoCard variant="elevated" padding="md" style={styles.navCard}>
+                  <Ionicons name="pricetag-outline" size={26} color={colors.primary} />
+                  <Text style={styles.navTitle}>QL Khuyến Mãi</Text>
+                  <Text style={styles.navDesc}>Mã giảm & ưu đãi</Text>
+                </BentoCard>
+              </AnimatedScaleButton>
+            </View>
+
+            <View style={[styles.navRow, { marginTop: spacing.md }]}>
+              <AnimatedScaleButton
                 onPress={() => navigation.navigate('AdminUsers')}
                 style={styles.navBtn}
               >
@@ -202,17 +246,15 @@ export const AdminDashboardView: React.FC<{ navigation: any }> = ({ navigation }
                   <Text style={styles.navDesc}>Tài khoản & điểm</Text>
                 </BentoCard>
               </AnimatedScaleButton>
-            </View>
 
-            <View style={[styles.navRow, { marginTop: spacing.md }]}>
               <AnimatedScaleButton
                 onPress={() => navigation.navigate('AdminUserTracking')}
                 style={styles.navBtn}
               >
                 <BentoCard variant="amber" padding="md" style={styles.navCard}>
                   <Ionicons name="analytics-outline" size={26} color={colors.primaryDark} />
-                  <Text style={styles.navTitle}>QL Tracking & Analytics</Text>
-                  <Text style={styles.navDesc}>Phân tích món yêu thích & tự động gợi ý</Text>
+                  <Text style={styles.navTitle}>QL Tracking</Text>
+                  <Text style={styles.navDesc}>Thống kê & gợi ý</Text>
                 </BentoCard>
               </AnimatedScaleButton>
             </View>
@@ -244,7 +286,10 @@ export const AdminDashboardView: React.FC<{ navigation: any }> = ({ navigation }
                 {res.status === 'PENDING' && (
                   <View style={styles.quickActionRow}>
                     <AnimatedScaleButton
-                      onPress={() => presenter.approveReservation(res.id)}
+                      onPress={async () => {
+                        await presenter.approveReservation(res.id);
+                        refreshData();
+                      }}
                       style={styles.approveBtn}
                     >
                       <Ionicons name="checkmark" size={16} color={colors.textInverse} />
@@ -252,7 +297,10 @@ export const AdminDashboardView: React.FC<{ navigation: any }> = ({ navigation }
                     </AnimatedScaleButton>
 
                     <AnimatedScaleButton
-                      onPress={() => presenter.rejectReservation(res.id)}
+                      onPress={async () => {
+                        await presenter.rejectReservation(res.id);
+                        refreshData();
+                      }}
                       style={styles.rejectBtn}
                     >
                       <Text style={styles.rejectText}>Từ Chối</Text>
@@ -344,8 +392,14 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: radius.lg,
   },
-  metricIconWrap: {
+  metricHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: spacing.xs,
+  },
+  metricIconWrap: {
+    marginBottom: 0,
   },
   metricLabel: {
     ...typography.overline,
@@ -371,6 +425,14 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textMuted,
     marginTop: 2,
+    fontSize: 11,
+  },
+  metricSubDark: {
+    ...typography.caption,
+    color: colors.primaryLight,
+    marginTop: 2,
+    fontSize: 11,
+    fontWeight: '600',
   },
   navSection: {
     marginBottom: spacing.xl,
@@ -456,4 +518,3 @@ const styles = StyleSheet.create({
 });
 
 export default AdminDashboardView;
-

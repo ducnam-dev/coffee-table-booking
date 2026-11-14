@@ -38,65 +38,31 @@ let MOCK_RESERVATIONS: Reservation[] = [
   },
 ];
 
-export function normalizeReservation(raw: any, fallback?: Partial<Reservation>): Reservation {
-  const tableId = raw.tableId || raw.coffeeTable?.id || fallback?.tableId || 1;
-  let tableNumber = raw.tableNumber || raw.coffeeTable?.tableNumber || raw.coffeeTable?.name || fallback?.tableNumber;
-  if (typeof tableNumber === 'string') {
-    tableNumber = tableNumber.replace(/^Bàn\s*/i, '').trim();
-  }
-  if (!tableNumber) {
-    tableNumber = `B0${tableId}`;
-  }
-
-  const rawItems = raw.orderItems || fallback?.orderItems || [];
-  const normalizedItems = rawItems.map((item: any) => {
-    if (item.menuItem) {
-      return {
-        menuItemId: item.menuItem.id,
-        name: item.menuItem.name,
-        price: item.menuItem.price,
-        quantity: item.quantity || 1,
-      };
-    }
-    return {
-      menuItemId: item.menuItemId || item.id || 1,
-      name: item.name || 'Món nước',
-      price: item.price || 0,
-      quantity: item.quantity || 1,
-    };
-  });
-
-  return {
-    id: raw.id || Date.now(),
-    customerName: raw.customerName || fallback?.customerName || 'Khách đặt',
-    phone: raw.phone || raw.customerPhone || fallback?.phone || '',
-    email: raw.email || raw.customerEmail || fallback?.email || '',
-    tableId,
-    tableNumber,
-    reservationDate: raw.reservationDate || fallback?.reservationDate || new Date().toISOString().split('T')[0],
-    reservationTime: raw.reservationTime || fallback?.reservationTime || '09:00',
-    guestCount: raw.guestCount || raw.guestNumber || fallback?.guestCount || 2,
-    orderItems: normalizedItems,
-    totalAmount: raw.totalAmount || fallback?.totalAmount || 0,
-    depositAmount: raw.depositAmount || fallback?.depositAmount || 50000,
-    status: raw.status || 'PENDING',
-    specialRequests: raw.specialRequests || raw.note || fallback?.specialRequests || '',
-    qrCode: raw.qrCode || `PAM-RES-${(raw.id || Date.now()).toString().slice(-4)}`,
-    createdAt: raw.createdAt || new Date().toLocaleString(),
-  };
-}
-
 export class ReservationModel {
-  static async getAllReservations(userId?: number): Promise<Reservation[]> {
+  static async getAllReservations(): Promise<Reservation[]> {
     try {
-      const url = userId ? `/reservations?user_id=${userId}` : '/reservations';
-      const res = await axiosClient.get(url);
-      if (Array.isArray(res.data)) {
-        const normalized = res.data.map((r: any) => normalizeReservation(r));
-        MOCK_RESERVATIONS = normalized;
-        return normalized;
+      const res = await axiosClient.get('/reservations');
+      if (Array.isArray(res.data) && res.data.length > 0) {
+        return res.data.map((r: any) => ({
+          id: r.id,
+          customerName: r.customerName || 'Khách đặt',
+          phone: r.customerPhone || r.phone || '0901234567',
+          email: r.customerEmail || r.email || '',
+          tableId: r.coffeeTable?.id || r.tableId || 1,
+          tableNumber: r.coffeeTable?.name || r.tableNumber || `B0${r.coffeeTable?.id || 1}`,
+          reservationDate: r.reservationTime ? r.reservationTime.split('T')[0] : r.reservationDate || '2026-11-14',
+          reservationTime: r.timeDisplay || (r.reservationTime ? r.reservationTime.split('T')[1]?.slice(0, 5) : '19:00'),
+          guestCount: r.guestNumber || r.guestCount || 2,
+          orderItems: r.orderItems || [],
+          totalAmount: r.totalAmount || 50000,
+          depositAmount: r.depositAmount || 0,
+          status: r.status || 'PENDING',
+          specialRequests: r.note || r.specialRequests || '',
+          qrCode: `PAM-RES-${r.id}`,
+          createdAt: r.createdAt || 'Vừa xong',
+        }));
       }
-      return MOCK_RESERVATIONS;
+      return res.data;
     } catch {
       return MOCK_RESERVATIONS;
     }
@@ -105,11 +71,26 @@ export class ReservationModel {
   static async createReservation(data: Partial<Reservation>): Promise<Reservation> {
     try {
       const res = await axiosClient.post('/reservations', data);
-      const normalized = normalizeReservation(res.data, data);
-      MOCK_RESERVATIONS = [normalized, ...MOCK_RESERVATIONS];
-      return normalized;
+      return res.data;
     } catch {
-      const newRes = normalizeReservation(data, data);
+      const newRes: Reservation = {
+        id: Date.now(),
+        customerName: data.customerName || 'Khách đặt',
+        phone: data.phone || '0900000000',
+        email: data.email || '',
+        tableId: data.tableId || 1,
+        tableNumber: data.tableNumber || 'B01',
+        reservationDate: data.reservationDate || new Date().toISOString().split('T')[0],
+        reservationTime: data.reservationTime || '10:00',
+        guestCount: data.guestCount || 2,
+        orderItems: data.orderItems || [],
+        totalAmount: data.totalAmount || 50000,
+        depositAmount: data.depositAmount || 50000,
+        status: 'PENDING',
+        specialRequests: data.specialRequests || '',
+        qrCode: `PAM-RES-${Date.now().toString().slice(-4)}`,
+        createdAt: new Date().toLocaleString(),
+      };
       MOCK_RESERVATIONS = [newRes, ...MOCK_RESERVATIONS];
       return newRes;
     }
@@ -118,17 +99,10 @@ export class ReservationModel {
   static async updateStatus(reservationId: number, status: ReservationStatus): Promise<Reservation> {
     try {
       const res = await axiosClient.put(`/reservations/${reservationId}/status`, { status });
-      const updated = normalizeReservation(res.data);
-      MOCK_RESERVATIONS = MOCK_RESERVATIONS.map((r) =>
-        r.id === reservationId ? { ...r, status } : r
-      );
-      return updated;
-    } catch (error) {
-      console.warn('[ReservationModel.updateStatus] fallback to local:', error);
-      MOCK_RESERVATIONS = MOCK_RESERVATIONS.map((r) =>
-        r.id === reservationId ? { ...r, status } : r
-      );
+      return res.data;
+    } catch {
       const found = MOCK_RESERVATIONS.find((r) => r.id === reservationId);
+      if (found) found.status = status;
       return found || ({ id: reservationId, status } as Reservation);
     }
   }
