@@ -1,10 +1,11 @@
 import { Platform } from 'react-native';
 
 const getDevHost = (): string => {
-  if (Platform.OS === 'android') {
-    return '10.0.2.2';
+  if (Platform.OS === 'web') {
+    return 'localhost';
   }
-  return 'localhost';
+  // Dùng IP LAN máy tính để điện thoại quét mã Expo Go kết nối được FastAPI
+  return '192.168.1.105';
 };
 
 export const API_CONFIG = {

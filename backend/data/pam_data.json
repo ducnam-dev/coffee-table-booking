@@ -179,6 +179,14 @@
       "price": 15000,
       "description": "Trà dâu tây tươi mát ngập tràn vị dâu ngọt ngào.",
       "available": true
+    },
+    {
+      "id": 1794622695645,
+      "name": "Trà lài sữa",
+      "category": "Cà Phê",
+      "price": 45000,
+      "description": "Thức uống thơm ngon hảo hạng",
+      "available": true
     }
   ],
   "reservations": [
@@ -261,7 +269,7 @@
       "timeDisplay": "Hôm nay",
       "guestNumber": 2,
       "note": "",
-      "status": "PENDING",
+      "status": "CONFIRMED",
       "orderItems": []
     },
     {
@@ -464,6 +472,41 @@
       "userId": 2,
       "menuItemId": 2,
       "timestamp": 1794477120817
+    }
+  ],
+  "promotions": [
+    {
+      "id": 1,
+      "code": "PAMWELCOME",
+      "title": "Ưu đãi khách hàng mới",
+      "description": "Giảm ngay 20% cho đơn đặt bàn đầu tiên tại Pam Coffee & Tea",
+      "discountPercent": 20,
+      "maxDiscount": 50000,
+      "minOrderValue": 50000,
+      "validUntil": "2026-12-31",
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "code": "HAPPYHOUR",
+      "title": "Happy Hour Sáng Vàng",
+      "description": "Giảm 15% tổng hóa đơn khung giờ 08:00 - 11:00 các ngày trong tuần",
+      "discountPercent": 15,
+      "maxDiscount": 40000,
+      "minOrderValue": 40000,
+      "validUntil": "2026-12-31",
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "code": "WEEKENDVIP",
+      "title": "Cuối tuần tụ họp VIP",
+      "description": "Giảm 10% cho bàn tiệc từ 4 người trở lên vào Thứ 7 & Chủ Nhật",
+      "discountPercent": 10,
+      "maxDiscount": 100000,
+      "minOrderValue": 100000,
+      "validUntil": "2026-12-31",
+      "isActive": true
     }
   ]
 }
